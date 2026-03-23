@@ -1,0 +1,15 @@
+# Padrao de final de linha para evitar conflito LF/CRLF
+* text=auto eol=lf
+
+# Arquivos binarios
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary

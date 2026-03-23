@@ -1,0 +1,34 @@
+# Dependências
+node_modules/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+
+# Build
+dist/
+build/
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+*.log
+
+# Editor / SO
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+
+# TypeScript
+*.tsbuildinfo
+
+# Vercel
+.vercel
+
+# Configuração local de assistente de codificação (não versionada)
+CLAUDE.md
