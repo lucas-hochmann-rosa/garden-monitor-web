@@ -1,0 +1,115 @@
+/* Estilos globais - paleta de cores, tipografia base e reset do Tailwind v4. */
+@import 'tailwindcss' source(none);
+@source '../**/*.{ts,tsx}';
+
+:root {
+  --font-size: 16px;
+  /* Paleta de cores Garden Monitor */
+  --garden-green-herb: #324b2c;
+  --garden-green-lime: #718f60;
+  --garden-white-ice: #f8f9fa;
+  --garden-white-ice-2: #dee2e6;
+  --garden-gray: #6c757d;
+  --garden-black: #000000;
+  --garden-white: #ffffff;
+
+  --background: #f8f9fa;
+  --foreground: #000000;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --popover: #ffffff;
+  --popover-foreground: #000000;
+  --primary: #324b2c;
+  --primary-foreground: #ffffff;
+  --secondary: #718f60;
+  --secondary-foreground: #ffffff;
+  --muted: #dee2e6;
+  --muted-foreground: #6c757d;
+  --accent: #718f60;
+  --accent-foreground: #ffffff;
+  --destructive: #dc3545;
+  --destructive-foreground: #ffffff;
+  --border: #dee2e6;
+  --input: transparent;
+  --input-background: #ffffff;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #324b2c;
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Barra de rolagem fina, quase invisível - combina com o visual minimalista do app. */
+  ::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(113, 143, 96, 0.25);
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(50, 75, 44, 0.35);
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(113, 143, 96, 0.25) transparent;
+  }
+
+  html {
+    font-size: var(--font-size);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  label,
+  button,
+  input {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+}
