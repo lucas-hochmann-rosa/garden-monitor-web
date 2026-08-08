@@ -45,21 +45,21 @@ export function LoginScreen() {
   };
 
   const inputClassName =
-    'w-full px-4 py-2.5 bg-[#fbf7f1] border border-[rgba(0,0,0,.1)] rounded-xl text-sm text-[#204a6f] placeholder:text-[rgba(0,0,0,.35)] focus:outline-none focus:ring-2 focus:ring-[#204a6f]';
+    'w-full px-4 py-2.5 bg-[#f8f9fa] border border-[#dee2e6] rounded-xl text-sm text-[#324b2c] placeholder:text-[#adb5bd] focus:outline-none focus:ring-2 focus:ring-[#324b2c]';
 
   return (
-    <div className="min-h-screen bg-[#fbf7f1] flex flex-col items-center justify-center p-6">
-      <div className="w-full max-w-[460px] bg-white border border-[rgba(0,0,0,.1)] rounded-xl shadow-sm p-7">
+    <div className="min-h-screen bg-[#f8f9fa] flex flex-col items-center justify-center p-6">
+      <div className="w-full max-w-[460px] bg-white border border-[#dee2e6] rounded-2xl shadow-sm p-7">
         <div className="flex flex-col items-center text-center mb-6">
           <div className="mb-4">
             <BrandMark size="lg" />
           </div>
-          <p className="text-sm text-[#616b75] mt-1">Acesso administrativo da horta.</p>
+          <p className="text-sm text-[#6c757d] mt-1">Acesso administrativo da horta.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-[#204a6f] mb-1.5">Usuário</label>
+            <label className="block text-xs font-semibold text-[#324b2c] mb-1.5">Usuário</label>
             <input
               type="text"
               value={username}
@@ -72,7 +72,7 @@ export function LoginScreen() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#204a6f] mb-1.5">Senha</label>
+            <label className="block text-xs font-semibold text-[#324b2c] mb-1.5">Senha</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -86,7 +86,7 @@ export function LoginScreen() {
               <button
                 type="button"
                 onClick={() => setShowPassword((previous) => !previous)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgba(0,0,0,.35)] hover:text-[#616b75] transition-colors cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#adb5bd] hover:text-[#6c757d] transition-colors cursor-pointer"
                 aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -95,13 +95,13 @@ export function LoginScreen() {
           </div>
 
           {errorMessage && (
-            <p className="text-xs text-[#a32b3c] bg-[rgba(163,43,60,.08)] border border-[rgba(163,43,60,.25)] rounded-lg px-3 py-2">{errorMessage}</p>
+            <p className="text-xs text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{errorMessage}</p>
           )}
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full px-5 py-2.5 bg-[#204a6f] text-white rounded-xl font-medium hover:brightness-110 active:scale-[0.98] transition-all text-sm disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full px-5 py-2.5 bg-[#324b2c] text-white rounded-xl font-semibold hover:bg-[#4a6b40] active:scale-[0.98] transition-all text-sm disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
           >
             {isSubmitting ? 'Entrando...' : 'Entrar'}
           </button>
@@ -110,7 +110,7 @@ export function LoginScreen() {
 
       <Link
         href="/"
-        className="mt-6 flex items-center gap-1.5 text-xs text-[#616b75] hover:text-[#204a6f] transition-colors cursor-pointer"
+        className="mt-6 flex items-center gap-1.5 text-xs text-[#6c757d] hover:text-[#324b2c] transition-colors cursor-pointer"
       >
         <ArrowLeft className="w-3.5 h-3.5" /> Voltar ao início
       </Link>

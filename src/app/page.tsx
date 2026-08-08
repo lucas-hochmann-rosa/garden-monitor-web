@@ -14,17 +14,17 @@ export default async function LandingPage() {
   const gardenName = await getGardenName();
 
   return (
-    <main className="min-h-screen bg-[#fbf7f1] flex flex-col items-center justify-center p-6 text-center">
+    <main className="min-h-screen bg-[#f8f9fa] flex flex-col items-center justify-center p-6 text-center">
       <BrandMark size="lg" />
 
-      <h1 className="text-[28px] font-medium text-[#204a6f] mt-6">{gardenName}</h1>
-      <p className="text-sm text-[#616b75] mt-2 max-w-[300px]">
+      <h1 className="text-3xl font-bold text-[#324b2c] mt-6">{gardenName}</h1>
+      <p className="text-sm text-[#6c757d] mt-2 max-w-md">
         Monitoramento em tempo real de umidade do solo, pH e clima da sua horta.
       </p>
 
       <Link
         href="/demo/dashboard"
-        className="mt-8 px-6 py-3 bg-[#204a6f] text-white rounded-xl font-medium hover:brightness-110 active:scale-95 transition-all cursor-pointer flex items-center gap-2 shadow-sm hover:shadow-md"
+        className="mt-8 px-6 py-3 bg-[#324b2c] text-white rounded-xl font-semibold hover:bg-[#718f60] active:scale-95 transition-all cursor-pointer flex items-center gap-2 shadow-sm hover:shadow-md"
       >
         <Sprout className="w-4 h-4" /> Ver demonstração
       </Link>
