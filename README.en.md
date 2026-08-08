@@ -89,9 +89,8 @@ garden-monitor-web/
 |   |-- migrate.ts                  # applies db/schema.sql
 |   |-- seed.ts                     # seeds garden_settings + example plants/records
 |   `-- hash-admin-password.ts      # generates the ADMIN_PASSWORD_HASH value
-|-- firmware/
-|   `-- esp8266_garden_monitor/     # Arduino firmware for the ESP8266 hub
-`-- .github/workflows/ci.yml        # lint + typecheck + build
+`-- firmware/
+    `-- esp8266_garden_monitor/     # Arduino firmware for the ESP8266 hub
 ```
 
 - `src/app/admin`: routes protected by the middleware - real CRUD against the database.
