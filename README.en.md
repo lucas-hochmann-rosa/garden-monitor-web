@@ -20,7 +20,7 @@
 
 <p align="center"><a href="README.md">🇧🇷 Português</a> · 🇺🇸 English</p>
 
-> Full-stack garden monitoring platform powered by real IoT sensors - an ESP8266 hub publishes per-plant soil moisture and pH, plus garden-wide climate, straight into a Postgres database (Neon). An authenticated admin area for the real garden, plus a public demo with no login and example data that is never persisted.
+> Garden monitoring platform powered by real IoT sensors - an ESP8266 hub publishes per-plant soil moisture and pH, plus garden-wide climate, straight into a Postgres database (Neon). 
 
 ---
 
@@ -59,7 +59,6 @@ Garden Monitor Web started as a React SPA with simulated data and was rewritten 
 - [Main Endpoints](#-main-endpoints)
 - [Access: admin and demo](#-access-admin-and-demo)
 - [Hardware and Firmware](#-hardware-and-firmware)
-- [Disclaimer](#-disclaimer)
 - [Author](#-author)
 - [License](#-license)
 
@@ -217,14 +216,6 @@ Header: X-Api-Key: <DEVICE_API_KEY>
 
 ---
 
-## ⚠️ Disclaimer
-
-- The physical hardware (ESP8266 + sensors) is still being assembled - the firmware already supports the full scenario (multiple plants via the multiplexer + PH4502C pH probe), but the calibration values are estimates until adjusted against the real sensors.
-- pH support (PH4502C) is implemented and documented, but has not been validated against the physical module, which hasn't been acquired yet.
-- No automated tests (unit/e2e) have been written yet.
-
----
-
 ## 🌳 Branch Flow
 
 - `main`: stable version, published to production.
@@ -236,6 +227,7 @@ Header: X-Api-Key: <DEVICE_API_KEY>
 
 **Lucas Hochmann Rosa**
 
+- Repository: <https://github.com/lucas-hochmann-rosa/garden-monitor-web>
 - GitHub: <https://github.com/lucas-hochmann-rosa>
 - LinkedIn: <https://www.linkedin.com/in/lucas-hochmann-rosa>
 
@@ -243,4 +235,4 @@ Header: X-Api-Key: <DEVICE_API_KEY>
 
 ## 📄 License
 
-Licensed under MIT. See [LICENSE](./LICENSE).
+Licensed under the MIT License. Feel free to use, modify, and distribute, provided you retain the copyright notice and give credit to Lucas Hochmann Rosa. See [LICENSE](./LICENSE).

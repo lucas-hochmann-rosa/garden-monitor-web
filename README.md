@@ -20,7 +20,7 @@
 
 <p align="center">🇧🇷 Português · <a href="README.en.md">🇺🇸 English</a></p>
 
-> Plataforma full-stack de monitoramento de horta via sensores IoT reais - um hub ESP8266 publica umidade do solo e pH por planta, além do clima da horta inteira, direto num banco Postgres (Neon). Área administrativa autenticada para a horta real e uma demonstração pública sem login, com dados de exemplo que nunca são persistidos.
+> Plataforma de monitoramento de horta via sensores IoT reais - um hub ESP8266 publica umidade do solo e pH por planta, além do clima da horta inteira, direto num banco Postgres (Neon).
 
 ---
 
@@ -59,7 +59,6 @@ O Garden Monitor Web nasceu como uma SPA em React com dados simulados e foi rees
 - [Endpoints Principais](#-endpoints-principais)
 - [Acesso: admin e demonstração](#-acesso-admin-e-demonstração)
 - [Hardware e Firmware](#-hardware-e-firmware)
-- [Avisos](#-avisos)
 - [Autor](#-autor)
 - [Licença](#-licença)
 
@@ -217,14 +216,6 @@ Header: X-Api-Key: <DEVICE_API_KEY>
 
 ---
 
-## ⚠️ Avisos
-
-- O hardware físico (ESP8266 + sensores) ainda está em montagem - o firmware já suporta o cenário completo (múltiplas plantas via multiplexador + sonda de pH PH4502C), mas os valores de calibração são estimativas até serem ajustados com os sensores reais.
-- O suporte a pH (PH4502C) é lógico e documentado, mas não foi validado com o módulo físico, que ainda não foi adquirido.
-- Nenhum teste automatizado (unitário/e2e) foi escrito ainda.
-
----
-
 ## 🌳 Fluxo de branches
 
 - `main`: versão estável, publicada em produção.
@@ -236,6 +227,7 @@ Header: X-Api-Key: <DEVICE_API_KEY>
 
 **Lucas Hochmann Rosa**
 
+- Repositório: <https://github.com/lucas-hochmann-rosa/garden-monitor-web>
 - GitHub: <https://github.com/lucas-hochmann-rosa>
 - LinkedIn: <https://www.linkedin.com/in/lucas-hochmann-rosa>
 
@@ -243,4 +235,4 @@ Header: X-Api-Key: <DEVICE_API_KEY>
 
 ## 📄 Licença
 
-Licenciado sob MIT. Consulte [LICENSE](./LICENSE).
+Licenciado sob MIT. Sinta-se livre para usar, modificar e distribuir, mantendo o aviso de copyright e atribuindo crédito a Lucas Hochmann Rosa. Consulte [LICENSE](./LICENSE).
