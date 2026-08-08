@@ -195,10 +195,16 @@ export function PlantsPanel({ plants: plantsFromServer }: PlantsPanelProps) {
                     </div>
                     <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
                       <PlantOriginBadge isExample={plant.isExample} />
-                      {plant.status !== 'healthy' && (
-                        <span className="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-full">
-                          ⚠ Em alerta
+                      {!plant.isExample && !plant.hasRealReading ? (
+                        <span className="px-2.5 py-1 bg-[#f8f9fa] border border-[#dee2e6] text-[#6c757d] text-xs font-semibold rounded-full">
+                          Aguardando sensor
                         </span>
+                      ) : (
+                        plant.status !== 'healthy' && (
+                          <span className="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-full">
+                            ⚠ Em alerta
+                          </span>
+                        )
                       )}
                     </div>
                   </div>
@@ -215,11 +221,13 @@ export function PlantsPanel({ plants: plantsFromServer }: PlantsPanelProps) {
                   <div className="space-y-2 mb-3">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-[#6c757d]">Umidade do solo</span>
-                      <span className="font-semibold text-[#324b2c]">{plant.soilMoisture}%</span>
+                      <span className="font-semibold text-[#324b2c]">
+                        {plant.soilMoisture !== null ? `${plant.soilMoisture}%` : 'Sem leitura'}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-[#6c757d]">pH do solo</span>
-                      <span className="font-semibold text-[#324b2c]">{plant.pH}</span>
+                      <span className="font-semibold text-[#324b2c]">{plant.pH !== null ? plant.pH : 'Sem leitura'}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-[#6c757d]">Crescimento</span>
