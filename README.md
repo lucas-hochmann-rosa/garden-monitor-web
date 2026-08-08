@@ -161,7 +161,8 @@ npm run db:seed      # cria a horta e as plantas de exemplo (garden_settings, pl
 | `ADMIN_USERNAME` | sim | Usuário do único administrador |
 | `ADMIN_PASSWORD_HASH` | sim | Hash SHA-256 da senha do admin - gere com `npm run admin:hash -- "sua-senha"` |
 | `GARDEN_NAME` | não | Nome padrão semeado em `garden_settings` (o admin pode trocar depois, sem redeploy) |
-| `WEATHER_LATITUDE` / `WEATHER_LONGITUDE` | não | Coordenadas da horta, usadas para buscar o clima real na landing page. Em branco, o widget de clima some |
+| `WEATHER_LATITUDE` / `WEATHER_LONGITUDE` | não | Coordenadas da horta, usadas como estimativa no card "Clima da horta" enquanto nenhum sensor real publicou uma leitura. Em branco, o card fica vazio até o primeiro dado real |
+| `HIDE_EXAMPLE_PLANTS` | não | `"true"` esconde as plantas de exemplo do admin e da demonstração pública (as linhas continuam no banco) |
 
 ---
 

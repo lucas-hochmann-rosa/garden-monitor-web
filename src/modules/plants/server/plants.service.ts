@@ -91,7 +91,11 @@ function mapRowToPlant(row: PlantRow): Plant {
 // o driver HTTP do Neon (sql`...`) não compõe fragmentos de SQL entre chamadas -
 // cada chamada de "sql" precisa ser uma tagged template completa e autocontida.
 
-// Lista todas as plantas com a leitura mais recente já embutida.
+// Lista todas as plantas com a leitura mais recente já embutida. Usada tanto pelo
+// admin quanto pelo layout de /demo - se HIDE_EXAMPLE_PLANTS estiver ligada, as
+// plantas de exemplo somem dos dois lugares de uma vez só, sem precisar filtrar em
+// cada chamador (útil quando a horta real já tem plantas suficientes e os exemplos
+// só atrapalham).
 export async function listPlants(): Promise<Plant[]> {
   const rows = (await sql`
     select
@@ -111,7 +115,9 @@ export async function listPlants(): Promise<Plant[]> {
     order by p.slot
   `) as unknown as PlantRow[];
 
-  return rows.map(mapRowToPlant);
+  const plants = rows.map(mapRowToPlant);
+  const hideExamplePlants = process.env.HIDE_EXAMPLE_PLANTS === 'true';
+  return hideExamplePlants ? plants.filter((plant) => !plant.isExample) : plants;
 }
 
 // Busca uma planta pelo id, com a leitura mais recente.

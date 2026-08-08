@@ -161,7 +161,8 @@ npm run db:seed      # creates the garden and example plants (garden_settings, p
 | `ADMIN_USERNAME` | yes | The single administrator's username |
 | `ADMIN_PASSWORD_HASH` | yes | SHA-256 hash of the admin password - generate with `npm run admin:hash -- "your-password"` |
 | `GARDEN_NAME` | no | Default name seeded into `garden_settings` (the admin can change it later, no redeploy needed) |
-| `WEATHER_LATITUDE` / `WEATHER_LONGITUDE` | no | Garden coordinates, used to fetch real weather on the landing page. Leave blank to hide the weather widget |
+| `WEATHER_LATITUDE` / `WEATHER_LONGITUDE` | no | Garden coordinates, used as an estimate on the "Garden climate" card while no real sensor reading has arrived yet. Leave blank to keep the card empty until real data shows up |
+| `HIDE_EXAMPLE_PLANTS` | no | `"true"` hides example plants from both the admin and the public demo (the rows stay in the database) |
 
 ---
 
