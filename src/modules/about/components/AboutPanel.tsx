@@ -3,15 +3,13 @@
 // por isso não precisa de "use client".
 import { Cpu, FileCode, Lightbulb, Sprout, Target } from 'lucide-react';
 
+// Só a versão estável publicada aparece aqui - sem entradas fake de versões
+// anteriores que nunca existiram como release de verdade neste repositório.
 const CHANGELOG_ENTRIES = [
-  { version: 'v0.1', description: 'Implementação do dashboard de monitoramento' },
-  { version: 'v0.2', description: 'Sistema de alertas condicionais e notificações' },
-  { version: 'v0.3', description: 'Upload de imagem para plantas e confirmação de exclusão' },
-  { version: 'v1.0', description: 'Migração para Next.js com banco de dados Neon e ingestão real via ESP8266' },
   {
-    version: 'v1.1',
+    version: 'v1.0.0',
     description:
-      'Sensores por planta (solo/pH) e clima compartilhado da horta, área administrativa separada da demonstração pública, e clima real da região na landing page',
+      'Lançamento inicial: sensores reais por planta (umidade do solo e pH) via hub ESP8266, clima compartilhado da horta, área administrativa autenticada separada da demonstração pública, e dados persistidos em Postgres (Neon).',
   },
 ];
 
@@ -111,8 +109,8 @@ export function AboutPanel() {
                   <FileCode className="w-4 h-4 text-[#718f60]" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-[#324b2c]">Notas de atualização</h3>
-                  <p className="text-xs text-[#6c757d] mt-0.5">Histórico de versões do sistema</p>
+                  <h3 className="text-base font-bold text-[#324b2c]">Versão</h3>
+                  <p className="text-xs text-[#6c757d] mt-0.5">Release estável atual do sistema</p>
                 </div>
               </div>
               <div className="space-y-3">
