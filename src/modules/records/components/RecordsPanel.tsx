@@ -12,28 +12,28 @@ import { useDemoContext } from '@/shared/demo/DemoProvider';
 
 const TYPE_STYLES: Record<GardenRecord['type'], { bg: string; border: string; text: string; icon: React.ReactNode }> = {
   system: {
-    bg: 'bg-[#fbf7f1]',
-    border: 'border-[rgba(0,0,0,.1)]',
-    text: 'text-[#616b75]',
-    icon: <Code className="w-4 h-4 text-[#616b75]" />,
+    bg: 'bg-[#f8f9fa]',
+    border: 'border-[#dee2e6]',
+    text: 'text-[#6c757d]',
+    icon: <Code className="w-4 h-4 text-[#6c757d]" />,
   },
   user: {
-    bg: 'bg-[rgba(32,74,111,.1)]',
-    border: 'border-[rgba(32,74,111,.2)]',
-    text: 'text-[#204a6f]',
-    icon: <User className="w-4 h-4 text-[#204a6f]" />,
+    bg: 'bg-[#f1f5f0]',
+    border: 'border-[#c8d9c0]',
+    text: 'text-[#324b2c]',
+    icon: <User className="w-4 h-4 text-[#324b2c]" />,
   },
   'auto-irrigation': {
-    bg: 'bg-[rgba(92,157,214,.1)]',
-    border: 'border-[rgba(92,157,214,.25)]',
-    text: 'text-[#204a6f]',
-    icon: <Droplet className="w-4 h-4 text-[#5c9dd6]" />,
+    bg: 'bg-blue-50',
+    border: 'border-blue-200',
+    text: 'text-blue-700',
+    icon: <Droplet className="w-4 h-4 text-blue-500" />,
   },
   'manual-irrigation': {
-    bg: 'bg-[rgba(92,157,214,.1)]',
-    border: 'border-[rgba(92,157,214,.25)]',
-    text: 'text-[#204a6f]',
-    icon: <Droplet className="w-4 h-4 text-[#5c9dd6]" />,
+    bg: 'bg-cyan-50',
+    border: 'border-cyan-200',
+    text: 'text-cyan-700',
+    icon: <Droplet className="w-4 h-4 text-cyan-500" />,
   },
 };
 
@@ -68,17 +68,17 @@ export function RecordsPanel({ records: recordsFromServer }: RecordsPanelProps) 
   };
 
   const inputClassName =
-    'w-full px-4 py-2.5 border border-[rgba(0,0,0,.1)] bg-[#fbf7f1] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#204a6f] text-sm';
+    'w-full px-4 py-2.5 border border-[#dee2e6] bg-[#f8f9fa] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#324b2c] text-sm';
 
   return (
-    <div className="h-screen bg-[#fbf7f1] ml-64 pt-16 flex flex-col overflow-hidden">
+    <div className="h-full bg-[#f8f9fa] flex flex-col overflow-hidden">
       <div className="p-6 flex flex-col flex-1 w-full gap-5 overflow-hidden">
         <div className="flex items-center justify-between flex-shrink-0">
-          <h1 className="text-[28px] font-medium text-[#204a6f]">Histórico de atividades da horta</h1>
+          <h1 className="text-2xl font-bold text-[#324b2c]">Histórico de atividades da horta</h1>
 
           <button
             onClick={() => setIsFormOpen((previous) => !previous)}
-            className="px-5 py-2.5 bg-[#204a6f] text-white rounded-xl font-medium hover:brightness-110 transition-colors flex items-center gap-2 text-sm shadow-sm"
+            className="px-5 py-2.5 bg-[#324b2c] text-white rounded-xl font-semibold hover:bg-[#718f60] transition-colors flex items-center gap-2 text-sm shadow-sm"
           >
             <Plus className="w-4 h-4" /> Novo registro
           </button>
@@ -87,21 +87,21 @@ export function RecordsPanel({ records: recordsFromServer }: RecordsPanelProps) 
         <div className="flex-1 overflow-y-auto pr-1">
           <div className="space-y-5">
             {isFormOpen && (
-              <div className="bg-white rounded-xl border border-[rgba(0,0,0,.1)] shadow-sm overflow-hidden">
-                <div className="px-7 py-5 border-b border-[rgba(0,0,0,.1)] flex items-center justify-between">
-                  <h3 className="font-medium text-[#204a6f]">Novo registro</h3>
+              <div className="bg-white rounded-2xl border border-[#dee2e6] shadow-sm overflow-hidden">
+                <div className="px-7 py-5 border-b border-[#dee2e6] flex items-center justify-between">
+                  <h3 className="font-bold text-[#324b2c]">Novo registro</h3>
                   <button
                     onClick={() => setIsFormOpen(false)}
-                    className="p-1.5 hover:bg-[#fbf7f1] rounded-lg transition-colors"
+                    className="p-1.5 hover:bg-[#f8f9fa] rounded-lg transition-colors"
                   >
-                    <X className="w-4 h-4 text-[#616b75]" />
+                    <X className="w-4 h-4 text-[#6c757d]" />
                   </button>
                 </div>
 
                 <form onSubmit={saveRecord} className="p-7 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-[#204a6f] mb-1.5">Título</label>
+                      <label className="block text-sm font-semibold text-[#324b2c] mb-1.5">Título</label>
                       <input
                         type="text"
                         value={newRecord.title}
@@ -113,7 +113,7 @@ export function RecordsPanel({ records: recordsFromServer }: RecordsPanelProps) 
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-[#204a6f] mb-1.5">Descrição</label>
+                      <label className="block text-sm font-semibold text-[#324b2c] mb-1.5">Descrição</label>
                       <input
                         type="text"
                         value={newRecord.description}
@@ -131,13 +131,13 @@ export function RecordsPanel({ records: recordsFromServer }: RecordsPanelProps) 
                     <button
                       type="button"
                       onClick={() => setIsFormOpen(false)}
-                      className="px-6 py-2.5 border border-[rgba(0,0,0,.1)] text-[#204a6f] rounded-xl font-medium hover:bg-[#fbf7f1] transition-colors text-sm"
+                      className="px-6 py-2.5 border border-[#dee2e6] text-[#324b2c] rounded-xl font-semibold hover:bg-[#f8f9fa] transition-colors text-sm"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      className="px-6 py-2.5 bg-[#204a6f] text-white rounded-xl font-medium hover:brightness-110 transition-colors text-sm"
+                      className="px-6 py-2.5 bg-[#324b2c] text-white rounded-xl font-semibold hover:bg-[#718f60] transition-colors text-sm"
                     >
                       Salvar registro
                     </button>
@@ -153,7 +153,7 @@ export function RecordsPanel({ records: recordsFromServer }: RecordsPanelProps) 
                 return (
                   <div
                     key={record.id}
-                    className="bg-white rounded-xl border border-[rgba(0,0,0,.1)] shadow-sm hover:shadow-md transition-shadow"
+                    className="bg-white rounded-2xl border border-[#dee2e6] shadow-sm hover:shadow-md transition-shadow"
                   >
                     <div className="p-5 flex items-start gap-4">
                       <div className={`w-10 h-10 rounded-xl ${style.bg} border ${style.border} flex items-center justify-center flex-shrink-0`}>
@@ -162,16 +162,16 @@ export function RecordsPanel({ records: recordsFromServer }: RecordsPanelProps) 
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2.5 mb-1">
-                          <h3 className="font-medium text-[#204a6f] text-sm">{record.title}</h3>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${style.bg} ${style.border} ${style.text} flex-shrink-0`}>
+                          <h3 className="font-semibold text-[#324b2c] text-sm">{record.title}</h3>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${style.bg} ${style.border} ${style.text} flex-shrink-0`}>
                             {RECORD_TYPE_LABELS[record.type]}
                           </span>
                         </div>
 
-                        <p className="text-sm text-[#616b75]">{record.description}</p>
+                        <p className="text-sm text-[#6c757d]">{record.description}</p>
 
-                        <div className="flex items-center gap-4 mt-2.5 text-xs text-[rgba(0,0,0,.35)]">
-                          <span className="flex items-center gap-1.5 font-mono">
+                        <div className="flex items-center gap-4 mt-2.5 text-xs text-[#adb5bd]">
+                          <span className="flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5" />
                             {record.date}
                           </span>
@@ -194,9 +194,9 @@ export function RecordsPanel({ records: recordsFromServer }: RecordsPanelProps) 
             </div>
 
             {records.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-16 bg-white rounded-xl border border-[rgba(0,0,0,.1)]">
-                <Sprout className="w-12 h-12 text-[rgba(0,0,0,.1)] mb-3" />
-                <p className="text-sm text-[#616b75]">Nenhum registro encontrado</p>
+              <div className="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border border-[#dee2e6]">
+                <Sprout className="w-12 h-12 text-[#dee2e6] mb-3" />
+                <p className="text-sm text-[#6c757d]">Nenhum registro encontrado</p>
               </div>
             )}
           </div>
