@@ -41,9 +41,10 @@ Garden Monitor Web started as a React SPA with simulated data and was rewritten 
 - **Single admin:** login authenticated via environment variables (username + SHA-256 password hash), no user table in the database.
 - **Non-persistent public demo:** the same interface as the admin, example data, any change is local to the browser only - with a fixed on-screen warning.
 - **EXAMPLE/REAL badge:** every plant shows whether it's a demo plant or part of the real garden.
-- **Real regional weather:** the public landing page fetches current weather via Open-Meteo (no API key), based on the configured latitude/longitude.
+- **Real regional weather:** while no sensor has published a climate reading yet, the "Garden climate" card falls back to real regional weather (Open-Meteo, no API key) as an estimate.
 - **Dashboard with alerts:** compares each plant against its ideal moisture, pH and temperature ranges, and flags whichever one is out of range.
-- **Activity history:** manual and irrigation records, with author and related plant.
+- **Cost-effective automatic irrigation:** a relay + mini pump per plant, triggered by the hub itself based on the configured interval/amount - no extra endpoint, the reading cycle's own response already carries the pending commands (see `firmware/README.md`).
+- **Activity history:** manual and automatic irrigation records, with author and related plant.
 
 ---
 
@@ -185,7 +186,7 @@ Visit `http://localhost:3000`: the public landing page, `http://localhost:3000/d
 | GET / POST | `/api/plants` | List / create plants (admin) |
 | PATCH / DELETE | `/api/plants/{id}` | Edit / delete a plant (admin) |
 | GET / POST | `/api/records` | List / create activity records (admin) |
-| POST | `/api/readings` | ESP8266 hub ingestion (authenticated via `X-Api-Key`), batched climate + plants payload |
+| POST | `/api/readings` | ESP8266 hub ingestion (authenticated via `X-Api-Key`), batched climate + plants payload - response carries pending automatic irrigation commands |
 
 ---
 
@@ -193,7 +194,7 @@ Visit `http://localhost:3000`: the public landing page, `http://localhost:3000/d
 
 **Admin (`/admin`):** log in with `ADMIN_USERNAME`/password (compared against the `ADMIN_PASSWORD_HASH`). Once logged in, `/admin/dashboard`, `/admin/plants`, `/admin/records`, `/admin/about` and `/admin/support` operate against the real database.
 
-**Demo (`/demo`):** public, no login. Shows only plants flagged as `EXAMPLE`. Every create/edit/delete stays in the browser's memory only (via `DemoProvider`) - a fixed banner at the top reminds visitors that nothing there is saved.
+**Demo (`/demo`):** public, no login. Shows every plant (example and real). Every create/edit/delete stays in the browser's memory only (via `DemoProvider`) - a fixed banner at the top reminds visitors that nothing there is saved.
 
 Every plant card carries an `EXAMPLE` or `REAL` badge, so even inside the admin (where both types can coexist) it's clear which data comes from a real sensor.
 
@@ -201,7 +202,7 @@ Every plant card carries an `EXAMPLE` or `REAL` badge, so even inside the admin 
 
 ## 🔌 Hardware and Firmware
 
-The dashboard shows real data as soon as the ESP8266 hub firmware starts publishing readings. Full hardware guide, wiring (with and without the CD74HC4051 multiplexer) and soil/pH sensor calibration in [`firmware/README.md`](./firmware/README.md).
+The dashboard shows real data as soon as the ESP8266 hub firmware starts publishing readings. Full hardware guide, wiring (with and without the CD74HC4051 multiplexer), automatic irrigation (relay + mini pump, with a cost estimate) and soil/pH sensor calibration in [`firmware/README.md`](./firmware/README.md).
 
 Protocol summary:
 
@@ -213,6 +214,11 @@ Header: X-Api-Key: <DEVICE_API_KEY>
   "plants": [{ "slot": "Slot 1", "soilMoisture": 62.4, "ph": 6.6 }]
 }
 ```
+
+Besides a summary of what was recorded, the response carries any pending
+automatic irrigation commands (`irrigationCommands`), which the firmware uses
+to trigger each plant's relay - a "fire and forget" model, with no flow sensor
+to confirm delivery (see `firmware/README.md`).
 
 ---
 

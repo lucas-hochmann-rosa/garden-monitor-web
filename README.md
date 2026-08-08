@@ -41,9 +41,10 @@ O Garden Monitor Web nasceu como uma SPA em React com dados simulados e foi rees
 - **Admin único:** login autenticado por variáveis de ambiente (usuário + hash SHA-256 da senha), sem tabela de usuários no banco.
 - **Demonstração pública sem persistência:** mesma interface do admin, dados de exemplo, qualquer alteração é só local ao navegador - com um aviso fixo na tela.
 - **Selo EXEMPLO/REAL:** toda planta exibe se é de demonstração ou da horta real.
-- **Clima real da região:** a landing page pública busca o clima atual via Open-Meteo (sem chave de API), a partir da latitude/longitude configuradas.
+- **Clima real da região:** enquanto nenhum sensor publicou uma leitura de clima, o card "Clima da horta" usa o clima real da região (Open-Meteo, sem chave de API) como estimativa.
 - **Dashboard com alertas:** compara cada planta com suas faixas ideais de umidade, pH e temperatura, e sinaliza quando alguma está fora da faixa.
-- **Histórico de atividades:** registros manuais e de irrigação, com autor e planta associada.
+- **Irrigação automática custo-benefício:** relé + mini-bomba por planta, acionados pelo próprio hub a partir do intervalo/quantidade cadastrados - sem endpoint novo, a resposta do ciclo de leituras já traz os comandos pendentes (ver `firmware/README.md`).
+- **Histórico de atividades:** registros manuais e de irrigação (automática e manual), com autor e planta associada.
 
 ---
 
@@ -185,7 +186,7 @@ Acesse `http://localhost:3000`: a landing pública, `http://localhost:3000/demo/
 | GET / POST | `/api/plants` | Listar / cadastrar plantas (admin) |
 | PATCH / DELETE | `/api/plants/{id}` | Editar / excluir uma planta (admin) |
 | GET / POST | `/api/records` | Listar / criar registros de atividade (admin) |
-| POST | `/api/readings` | Ingestão do hub ESP8266 (autenticado por `X-Api-Key`), payload em lote de clima + plantas |
+| POST | `/api/readings` | Ingestão do hub ESP8266 (autenticado por `X-Api-Key`), payload em lote de clima + plantas - resposta traz os comandos de irrigação automática pendentes |
 
 ---
 
@@ -193,7 +194,7 @@ Acesse `http://localhost:3000`: a landing pública, `http://localhost:3000/demo/
 
 **Admin (`/admin`):** login com `ADMIN_USERNAME`/senha (comparada ao hash em `ADMIN_PASSWORD_HASH`). Depois de logado, `/admin/dashboard`, `/admin/plants`, `/admin/records`, `/admin/about` e `/admin/support` operam contra o banco de verdade.
 
-**Demonstração (`/demo`):** pública, sem login. Mostra só as plantas marcadas como `EXEMPLO`. Toda criação/edição/exclusão fica só em memória no navegador (via `DemoProvider`) - um aviso fixo no topo da tela lembra que nada ali é salvo.
+**Demonstração (`/demo`):** pública, sem login. Mostra todas as plantas (exemplo e reais). Toda criação/edição/exclusão fica só em memória no navegador (via `DemoProvider`) - um aviso fixo no topo da tela lembra que nada ali é salvo.
 
 Cada card de planta traz um selo `EXEMPLO` ou `REAL`, então mesmo dentro do admin (onde os dois tipos podem coexistir) fica claro qual dado vem de um sensor de verdade.
 
@@ -201,7 +202,7 @@ Cada card de planta traz um selo `EXEMPLO` ou `REAL`, então mesmo dentro do adm
 
 ## 🔌 Hardware e Firmware
 
-O dashboard exibe dados reais assim que o firmware do hub ESP8266 começa a publicar leituras. Guia completo de hardware, ligações (com e sem o multiplexador CD74HC4051) e calibração do sensor de solo/pH em [`firmware/README.md`](./firmware/README.md).
+O dashboard exibe dados reais assim que o firmware do hub ESP8266 começa a publicar leituras. Guia completo de hardware, ligações (com e sem o multiplexador CD74HC4051), irrigação automática (relé + mini-bomba, com estimativa de custo) e calibração do sensor de solo/pH em [`firmware/README.md`](./firmware/README.md).
 
 Resumo do protocolo:
 
@@ -213,6 +214,11 @@ Header: X-Api-Key: <DEVICE_API_KEY>
   "plants": [{ "slot": "Slot 1", "soilMoisture": 62.4, "ph": 6.6 }]
 }
 ```
+
+A resposta traz, além do resumo do que foi gravado, os comandos de irrigação
+automática pendentes (`irrigationCommands`), que o firmware usa pra acionar o
+relé de cada planta - modelo "dispara e esquece", sem sensor de fluxo pra
+confirmar a entrega (ver `firmware/README.md`).
 
 ---
 

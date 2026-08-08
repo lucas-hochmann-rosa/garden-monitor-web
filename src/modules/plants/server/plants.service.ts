@@ -2,6 +2,7 @@
 // enviadas pelo hub ESP8266 (umidade do solo/pH por planta + clima da horta).
 import { sql } from '@/shared/lib/db';
 import { calculateGrowthPercent, calculateStatus } from '@/shared/lib/plant-metrics';
+import { createRecord } from '@/modules/records/server/records.service';
 import type { Plant, PlantFormInput } from '@/modules/plants/types/plant.types';
 
 interface PlantRow {
@@ -214,17 +215,67 @@ interface ReadingsBatchInput {
   plants: PlantReadingInput[];
 }
 
+interface IrrigationCommand {
+  slot: string;
+  milliliters: number;
+}
+
 interface ReadingsBatchResult {
   climateRecorded: boolean;
   plantsUpdated: string[];
   unknownSlots: string[];
+  irrigationCommands: IrrigationCommand[];
+}
+
+// Planta candidata a irrigação automática: só o que o cálculo de "está devendo
+// irrigação?" precisa, já filtrado por auto_irrigation = true e is_example = false.
+interface AutoIrrigationPlantRow {
+  id: string;
+  auto_irrigation: boolean;
+  irrigation_amount_ml: string | null;
+  irrigation_interval_hours: string | null;
+}
+
+// "Dispara e esquece": sem sensor de fluxo no hardware, não dá pra confirmar que a
+// água realmente saiu - então isso decide só se já passou tempo suficiente desde o
+// último comando emitido (reaproveita o histórico de "records" tipo
+// "auto-irrigation" em vez de guardar isso numa coluna nova), e o registro criado
+// representa "o comando foi mandado pro hub", não "a planta foi molhada de verdade".
+async function checkAndRecordAutoIrrigation(plant: AutoIrrigationPlantRow): Promise<IrrigationCommand | null> {
+  if (!plant.auto_irrigation || !plant.irrigation_amount_ml || !plant.irrigation_interval_hours) return null;
+
+  const lastRows = (await sql`
+    select created_at from records
+    where plant_id = ${plant.id} and type = 'auto-irrigation'
+    order by created_at desc
+    limit 1
+  `) as unknown as { created_at: string }[];
+
+  const intervalMs = Number(plant.irrigation_interval_hours) * 60 * 60 * 1000;
+  const lastAt = lastRows[0]?.created_at;
+  const isDue = !lastAt || Date.now() - new Date(lastAt).getTime() >= intervalMs;
+  if (!isDue) return null;
+
+  const milliliters = Number(plant.irrigation_amount_ml);
+  await createRecord({
+    type: 'auto-irrigation',
+    title: 'Irrigação automática',
+    description: `Comando de irrigação automática enviado ao hub - ${milliliters}ml`,
+    author: 'Sistema',
+    plantId: plant.id,
+  });
+
+  return { slot: '', milliliters }; // slot preenchido pelo chamador, que já o conhece
 }
 
 // Registra um ciclo de leituras enviado pelo hub ESP8266: uma leitura de clima da
 // horta (opcional, se o DHT11 respondeu) e uma leitura de solo/pH por planta do
 // payload. Plantas de exemplo (is_example) são ignoradas - o sensor real nunca
 // sobrescreve dado de demonstração - e slots sem planta cadastrada são reportados
-// em unknownSlots em vez de interromper o processamento das demais.
+// em unknownSlots em vez de interromper o processamento das demais. Além de gravar
+// as leituras, verifica quais das plantas recebidas estão com irrigação automática
+// vencida e devolve os comandos correspondentes na resposta (ver
+// checkAndRecordAutoIrrigation) - o firmware aciona o relé configurado pra cada slot.
 export async function ingestReadingsBatch(input: ReadingsBatchInput): Promise<ReadingsBatchResult> {
   let climateRecorded = false;
   if (input.climate && (input.climate.temperature !== undefined || input.climate.airHumidity !== undefined)) {
@@ -237,11 +288,13 @@ export async function ingestReadingsBatch(input: ReadingsBatchInput): Promise<Re
 
   const plantsUpdated: string[] = [];
   const unknownSlots: string[] = [];
+  const irrigationCommands: IrrigationCommand[] = [];
 
   for (const reading of input.plants) {
     const plantRows = (await sql`
-      select id from plants where slot = ${reading.slot} and is_example = false
-    `) as unknown as { id: string }[];
+      select id, auto_irrigation, irrigation_amount_ml, irrigation_interval_hours
+      from plants where slot = ${reading.slot} and is_example = false
+    `) as unknown as AutoIrrigationPlantRow[];
     const plant = plantRows[0];
 
     if (!plant) {
@@ -254,9 +307,12 @@ export async function ingestReadingsBatch(input: ReadingsBatchInput): Promise<Re
       values (${plant.id}, ${reading.soilMoisture}, ${reading.ph ?? null})
     `;
     plantsUpdated.push(plant.id);
+
+    const command = await checkAndRecordAutoIrrigation(plant);
+    if (command) irrigationCommands.push({ ...command, slot: reading.slot });
   }
 
-  return { climateRecorded, plantsUpdated, unknownSlots };
+  return { climateRecorded, plantsUpdated, unknownSlots, irrigationCommands };
 }
 
 export interface LatestClimate {
