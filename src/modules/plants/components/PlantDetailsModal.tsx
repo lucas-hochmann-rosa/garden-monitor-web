@@ -21,22 +21,22 @@ function IrrigationModal({ onConfirm, onCancel }: IrrigationModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60] p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl max-w-[420px] w-full shadow-2xl border border-[#dee2e6] overflow-hidden">
+      <div className="bg-white rounded-xl max-w-[420px] w-full shadow-2xl border border-[rgba(0,0,0,.1)] overflow-hidden">
         <div className="p-6">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-              <Droplet className="w-6 h-6 text-blue-500" />
+            <div className="w-12 h-12 rounded-xl bg-[rgba(92,157,214,.1)] flex items-center justify-center flex-shrink-0">
+              <Droplet className="w-6 h-6 text-[#5c9dd6]" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-[#324b2c]">Irrigação manual</h3>
-              <p className="text-sm text-[#6c757d] mt-0.5">Registre a irrigação realizada</p>
+              <h3 className="text-[20px] font-medium text-[#204a6f]">Irrigação manual</h3>
+              <p className="text-sm text-[#616b75] mt-0.5">Registre a irrigação realizada</p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-[#324b2c] mb-1.5">
-                Quantidade irrigada (ml) <span className="text-amber-500">*</span>
+              <label className="block text-sm font-medium text-[#204a6f] mb-1.5">
+                Quantidade irrigada (ml) <span className="text-[#8a6a10]">*</span>
               </label>
               <input
                 type="number"
@@ -46,7 +46,7 @@ function IrrigationModal({ onConfirm, onCancel }: IrrigationModalProps) {
                 min="0"
                 step="any"
                 placeholder="Ex: 235"
-                className="w-full px-3 py-2.5 bg-[#f8f9fa] border border-[#dee2e6] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#324b2c] text-sm"
+                className="w-full px-3 py-2.5 bg-[#fbf7f1] border border-[rgba(0,0,0,.1)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#204a6f] text-sm"
               />
             </div>
 
@@ -54,13 +54,13 @@ function IrrigationModal({ onConfirm, onCancel }: IrrigationModalProps) {
               <button
                 type="button"
                 onClick={onCancel}
-                className="flex-1 px-5 py-2.5 border border-[#dee2e6] bg-[#f8f9fa] text-[#324b2c] rounded-xl font-semibold hover:bg-[#dee2e6] transition-colors text-sm"
+                className="flex-1 px-5 py-2.5 border border-[rgba(0,0,0,.1)] bg-[#fbf7f1] text-[#204a6f] rounded-xl font-medium hover:bg-white hover:border-[rgba(0,0,0,.18)] transition-colors text-sm"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="flex-1 px-5 py-2.5 bg-[#324b2c] text-white rounded-xl font-semibold hover:bg-[#718f60] transition-colors text-sm"
+                className="flex-1 px-5 py-2.5 bg-[#204a6f] text-white rounded-xl font-medium hover:brightness-110 transition-colors text-sm"
               >
                 Confirmar
               </button>
@@ -98,7 +98,7 @@ function PhGradientBar({ ph, idealPH }: { ph: number; idealPH?: { min: number; m
             className="w-[10px] h-[18px] rounded-sm flex items-center justify-center shadow-md border border-white/60"
             style={{ background: 'rgba(255,255,255,0.92)', top: '-4px', position: 'relative' }}
           >
-            <span style={{ fontSize: '9px', fontWeight: 800, color: '#324b2c', lineHeight: 1, userSelect: 'none' }}>
+            <span style={{ fontSize: '9px', fontWeight: 800, color: '#204a6f', lineHeight: 1, userSelect: 'none' }}>
               I
             </span>
           </div>
@@ -106,9 +106,9 @@ function PhGradientBar({ ph, idealPH }: { ph: number; idealPH?: { min: number; m
       </div>
 
       <div className="flex justify-between mt-1">
-        <span className="text-[10px] text-[#adb5bd]">0</span>
-        <span className="text-[10px] text-[#adb5bd]">7</span>
-        <span className="text-[10px] text-[#adb5bd]">14</span>
+        <span className="text-[10px] text-[rgba(0,0,0,.35)]">0</span>
+        <span className="text-[10px] text-[rgba(0,0,0,.35)]">7</span>
+        <span className="text-[10px] text-[rgba(0,0,0,.35)]">14</span>
       </div>
     </div>
   );
@@ -145,31 +145,31 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
       className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
       onClick={(event) => event.target === event.currentTarget && onClose()}
     >
-      <div className="bg-white rounded-2xl w-full max-w-[720px] shadow-2xl border border-[#dee2e6] overflow-hidden">
-        <div className="px-6 py-4 flex items-center justify-between border-b border-[#dee2e6]">
+      <div className="bg-white rounded-xl w-full max-w-[720px] shadow-2xl border border-[rgba(0,0,0,.1)] overflow-hidden">
+        <div className="px-6 py-4 flex items-center justify-between border-b border-[rgba(0,0,0,.1)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#f1f5f0] flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <div className="w-10 h-10 rounded-xl bg-[rgba(32,74,111,.1)] flex items-center justify-center flex-shrink-0 overflow-hidden">
               {plant.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={plant.image} alt={plant.name} className="w-full h-full object-cover" />
               ) : (
-                <Sprout className="w-5 h-5 text-[#324b2c]" />
+                <Sprout className="w-5 h-5 text-[#204a6f]" />
               )}
             </div>
             <div>
-              <h2 className="text-lg font-bold text-[#324b2c] leading-tight">{plant.name}</h2>
-              <p className="text-xs text-[#718f60]">{plant.slot}</p>
+              <h2 className="text-[20px] font-medium text-[#204a6f] leading-tight">{plant.name}</h2>
+              <p className="text-xs font-mono text-[#204a6f]">{plant.slot}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-3.5 py-2 bg-[#f1f5f0] border border-[#c8d9c0] rounded-xl">
+          <div className="flex items-center gap-2 px-3.5 py-2 bg-[rgba(32,74,111,.1)] border border-[rgba(32,74,111,.2)] rounded-xl">
             <span
-              className={`w-2 h-2 rounded-full flex-shrink-0 ${plant.hasRealReading ? 'bg-emerald-500 animate-pulse' : 'bg-[#adb5bd]'}`}
+              className={`w-2 h-2 rounded-full flex-shrink-0 ${plant.hasRealReading ? 'bg-[#2f7a54] animate-pulse' : 'bg-[rgba(0,0,0,.35)]'}`}
             />
-            <Clock className="w-3.5 h-3.5 text-[#718f60] flex-shrink-0" />
+            <Clock className="w-3.5 h-3.5 text-[#204a6f] flex-shrink-0" />
             <div className="flex items-baseline gap-1.5">
-              <span className="text-xs font-semibold text-[#324b2c]">Última leitura</span>
-              <span className="text-xs text-[#6c757d]">
+              <span className="text-xs font-medium text-[#204a6f]">Última leitura</span>
+              <span className="text-xs font-mono text-[#616b75]">
                 {plant.hasRealReading && plant.lastReadingAt
                   ? formatRelativeTime(plant.lastReadingAt)
                   : 'aguardando sensor'}
@@ -180,18 +180,18 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
           <div className="flex items-center gap-2">
             <PlantOriginBadge isExample={plant.isExample} />
             <span
-              className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+              className={`px-3 py-1 rounded-full text-xs font-medium border ${
                 isAwaitingSensor
-                  ? 'bg-[#f8f9fa] text-[#6c757d] border-[#dee2e6]'
+                  ? 'bg-[#fbf7f1] text-[#616b75] border-[rgba(0,0,0,.1)]'
                   : isHealthy
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : 'bg-amber-50 text-amber-600 border-amber-200'
+                    ? 'bg-[rgba(47,122,84,.08)] text-[#2f7a54] border-[rgba(47,122,84,.25)]'
+                    : 'bg-[rgba(138,106,16,.08)] text-[#8a6a10] border-[rgba(138,106,16,.25)]'
               }`}
             >
               {isAwaitingSensor ? 'Aguardando sensor' : isHealthy ? '✓ Saudável' : '⚠ Em alerta'}
             </span>
-            <button onClick={onClose} className="p-1.5 hover:bg-[#f8f9fa] rounded-lg transition-colors">
-              <X className="w-4 h-4 text-[#6c757d]" />
+            <button onClick={onClose} className="p-1.5 hover:bg-[#fbf7f1] rounded-lg transition-colors">
+              <X className="w-4 h-4 text-[#616b75]" />
             </button>
           </div>
         </div>
@@ -199,35 +199,35 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
         <div className="p-6 grid grid-cols-[1fr_1.2fr] gap-6">
           <div className="flex flex-col gap-4">
             <div
-              className="rounded-xl overflow-hidden bg-[#f1f5f0] border border-[#dee2e6] flex items-center justify-center"
+              className="rounded-xl overflow-hidden bg-[rgba(32,74,111,.1)] border border-[rgba(0,0,0,.1)] flex items-center justify-center"
               style={{ height: '180px' }}
             >
               {plant.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={plant.image} alt={plant.name} className="w-full h-full object-cover" />
               ) : (
-                <Sprout className="w-14 h-14 text-[#718f60] opacity-60" />
+                <Sprout className="w-14 h-14 text-[#204a6f] opacity-60" />
               )}
             </div>
 
             <div>
-              <p className="text-[10px] font-semibold text-[#adb5bd] uppercase tracking-widest mb-2">Informações</p>
+              <p className="text-[10px] font-medium text-[rgba(0,0,0,.35)] uppercase tracking-widest mb-2">Informações</p>
               <div className="grid grid-cols-2 gap-2">
-                <div className="flex items-center gap-2 p-2.5 bg-[#f8f9fa] rounded-xl border border-[#dee2e6]">
-                  <Calendar className="w-3.5 h-3.5 text-[#718f60] flex-shrink-0" />
+                <div className="flex items-center gap-2 p-2.5 bg-[#fbf7f1] rounded-xl border border-[rgba(0,0,0,.1)]">
+                  <Calendar className="w-3.5 h-3.5 text-[#204a6f] flex-shrink-0" />
                   <div>
-                    <p className="text-[10px] text-[#adb5bd]">Plantio</p>
-                    <p className="text-xs font-semibold text-[#324b2c]">
+                    <p className="text-[10px] text-[rgba(0,0,0,.35)]">Plantio</p>
+                    <p className="text-xs font-medium text-[#204a6f]">
                       {plant.plantedDate ? formatDatePtBr(plant.plantedDate) : 'N/A'}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 p-2.5 bg-[#f8f9fa] rounded-xl border border-[#dee2e6]">
-                  <Calendar className="w-3.5 h-3.5 text-[#718f60] flex-shrink-0" />
+                <div className="flex items-center gap-2 p-2.5 bg-[#fbf7f1] rounded-xl border border-[rgba(0,0,0,.1)]">
+                  <Calendar className="w-3.5 h-3.5 text-[#204a6f] flex-shrink-0" />
                   <div>
-                    <p className="text-[10px] text-[#adb5bd]">Colheita prevista</p>
-                    <p className="text-xs font-semibold text-[#324b2c]">
+                    <p className="text-[10px] text-[rgba(0,0,0,.35)]">Colheita prevista</p>
+                    <p className="text-xs font-medium text-[#204a6f]">
                       {plant.estimatedDate ? formatDatePtBr(plant.estimatedDate) : 'N/A'}
                     </p>
                   </div>
@@ -237,21 +237,21 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-[#6c757d]">Progresso de crescimento</span>
-                <span className="text-xs font-semibold text-[#324b2c]">{plant.growth}%</span>
+                <span className="text-xs text-[#616b75]">Progresso de crescimento</span>
+                <span className="text-xs font-mono font-medium text-[#204a6f]">{plant.growth}%</span>
               </div>
-              <div className="h-2 bg-[#dee2e6] rounded-full overflow-hidden">
+              <div className="h-2 bg-[rgba(0,0,0,.1)] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-[#324b2c] to-[#718f60] rounded-full transition-all"
+                  className="h-full bg-[#204a6f] rounded-full transition-all"
                   style={{ width: `${plant.growth}%` }}
                 />
               </div>
               {plant.plantedDate && plant.estimatedDate && (
                 <div className="flex justify-between mt-1">
-                  <span className="text-[10px] text-[#adb5bd]">
+                  <span className="text-[10px] text-[rgba(0,0,0,.35)]">
                     {new Date(plant.plantedDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                   </span>
-                  <span className="text-[10px] text-[#adb5bd]">
+                  <span className="text-[10px] text-[rgba(0,0,0,.35)]">
                     {new Date(plant.estimatedDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
                   </span>
                 </div>
@@ -261,29 +261,29 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
 
           <div className="flex flex-col gap-4">
             <div>
-              <p className="text-[10px] font-semibold text-[#adb5bd] uppercase tracking-widest mb-3">
+              <p className="text-[10px] font-medium text-[rgba(0,0,0,.35)] uppercase tracking-widest mb-3">
                 Leituras dos sensores
               </p>
 
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-1.5">
-                    <Droplet className="w-4 h-4 text-blue-400" />
-                    <span className="text-sm font-semibold text-[#324b2c]">Umidade do solo</span>
+                    <Droplet className="w-4 h-4 text-[#5c9dd6]" />
+                    <span className="text-sm font-medium text-[#204a6f]">Umidade do solo</span>
                   </div>
-                  <span className="text-xl font-black text-[#324b2c]">
+                  <span className="text-[20px] font-mono font-medium text-[#204a6f]">
                     {plant.soilMoisture !== null ? `${plant.soilMoisture}%` : 'Sem leitura'}
                   </span>
                 </div>
                 {plant.idealMoisture && (
-                  <p className="text-[11px] text-[#adb5bd] mb-1.5">
+                  <p className="text-[11px] text-[rgba(0,0,0,.35)] mb-1.5">
                     Ideal: {plant.idealMoisture.min}% - {plant.idealMoisture.max}%
                   </p>
                 )}
-                <div className="relative h-2 bg-[#dee2e6] rounded-full overflow-hidden">
+                <div className="relative h-2 bg-[rgba(0,0,0,.1)] rounded-full overflow-hidden">
                   <div
                     className={`absolute h-full rounded-full transition-all ${
-                      moistureStatus === 'ok' ? 'bg-blue-400' : 'bg-amber-400'
+                      moistureStatus === 'ok' ? 'bg-[#5c9dd6]' : 'bg-[#8a6a10]'
                     }`}
                     style={{ width: plant.soilMoisture !== null ? `${Math.min(plant.soilMoisture, 100)}%` : '0%' }}
                   />
@@ -293,32 +293,34 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-1.5">
-                    <FlaskConical className="w-4 h-4 text-[#718f60]" />
-                    <span className="text-sm font-semibold text-[#324b2c]">pH do solo</span>
+                    <FlaskConical className="w-4 h-4 text-[#204a6f]" />
+                    <span className="text-sm font-medium text-[#204a6f]">pH do solo</span>
                   </div>
-                  <span className="text-xl font-black text-[#324b2c]">{plant.pH !== null ? plant.pH : 'Sem leitura'}</span>
+                  <span className="text-[20px] font-mono font-medium text-[#204a6f]">
+                    {plant.pH !== null ? plant.pH : 'Sem leitura'}
+                  </span>
                 </div>
                 {plant.idealPH && (
-                  <p className="text-[11px] text-[#adb5bd] mb-1.5">
+                  <p className="text-[11px] text-[rgba(0,0,0,.35)] mb-1.5">
                     Ideal: {plant.idealPH.min} - {plant.idealPH.max}
                   </p>
                 )}
                 {plant.pH !== null ? (
                   <PhGradientBar ph={plant.pH} idealPH={plant.idealPH} />
                 ) : (
-                  <div className="h-2.5 rounded-full bg-[#dee2e6]" />
+                  <div className="h-2.5 rounded-full bg-[rgba(0,0,0,.1)]" />
                 )}
               </div>
             </div>
 
             <div>
-              <p className="text-[10px] font-semibold text-[#adb5bd] uppercase tracking-widest mb-2">Irrigação</p>
-              <div className="p-3 rounded-xl border border-[#dee2e6] bg-[#f8f9fa]">
+              <p className="text-[10px] font-medium text-[rgba(0,0,0,.35)] uppercase tracking-widest mb-2">Irrigação</p>
+              <div className="p-3 rounded-xl border border-[rgba(0,0,0,.1)] bg-[#fbf7f1]">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-sm text-[#324b2c]">Irrigação automática</span>
+                  <span className="text-sm text-[#204a6f]">Irrigação automática</span>
                   <span
-                    className={`ml-auto text-xs font-bold px-2 py-0.5 rounded-full ${
-                      plant.autoIrrigation ? 'bg-emerald-100 text-emerald-700' : 'bg-[#dee2e6] text-[#6c757d]'
+                    className={`ml-auto text-xs font-medium px-2 py-0.5 rounded-full ${
+                      plant.autoIrrigation ? 'bg-[rgba(47,122,84,.14)] text-[#2f7a54]' : 'bg-[rgba(0,0,0,.1)] text-[#616b75]'
                     }`}
                   >
                     {plant.autoIrrigation ? 'ATIVADA' : 'DESATIVADA'}
@@ -326,10 +328,10 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
                 </div>
 
                 {plant.autoIrrigation && (plant.irrigationAmount || plant.irrigationInterval) && (
-                  <div className="flex items-center gap-2 mt-2.5 pt-2.5 border-t border-[#dee2e6]">
-                    <Timer className="w-3.5 h-3.5 text-blue-400" />
-                    <span className="text-xs text-[#6c757d]">Configuração:</span>
-                    <span className="text-xs font-bold text-[#324b2c] bg-blue-50 px-2 py-0.5 rounded-full ml-auto">
+                  <div className="flex items-center gap-2 mt-2.5 pt-2.5 border-t border-[rgba(0,0,0,.1)]">
+                    <Timer className="w-3.5 h-3.5 text-[#5c9dd6]" />
+                    <span className="text-xs text-[#616b75]">Configuração:</span>
+                    <span className="text-xs font-medium text-[#204a6f] bg-[rgba(92,157,214,.1)] px-2 py-0.5 rounded-full ml-auto">
                       {plant.irrigationAmount ?? '-'}ml a cada {plant.irrigationInterval ?? '-'}h
                     </span>
                   </div>
@@ -343,7 +345,7 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
           {!plant.autoIrrigation && (
             <button
               onClick={() => setIsIrrigationModalOpen(true)}
-              className="w-full py-3.5 bg-[#324b2c] text-white rounded-xl font-semibold hover:bg-[#4a6b40] transition-colors flex items-center justify-center gap-2 shadow-sm"
+              className="w-full py-3.5 bg-[#204a6f] text-white rounded-xl font-medium hover:brightness-110 transition-colors flex items-center justify-center gap-2 shadow-sm"
             >
               <Droplet className="w-4 h-4" />
               Irrigar

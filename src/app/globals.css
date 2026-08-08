@@ -1,42 +1,76 @@
-/* Estilos globais - paleta de cores, tipografia base e reset do Tailwind v4. */
+/* Estilos globais - paleta de cores (sistema de design pessoal do autor,
+   compartilhado entre projetos), tipografia e reset do Tailwind v4. */
 @import 'tailwindcss' source(none);
 @source '../**/*.{ts,tsx}';
 
 :root {
   --font-size: 16px;
-  /* Paleta de cores Garden Monitor */
-  --garden-green-herb: #324b2c;
-  --garden-green-lime: #718f60;
-  --garden-white-ice: #f8f9fa;
-  --garden-white-ice-2: #dee2e6;
-  --garden-gray: #6c757d;
-  --garden-black: #000000;
-  --garden-white: #ffffff;
 
-  --background: #f8f9fa;
-  --foreground: #000000;
-  --card: #ffffff;
-  --card-foreground: #000000;
-  --popover: #ffffff;
-  --popover-foreground: #000000;
-  --primary: #324b2c;
-  --primary-foreground: #ffffff;
-  --secondary: #718f60;
-  --secondary-foreground: #ffffff;
-  --muted: #dee2e6;
-  --muted-foreground: #6c757d;
-  --accent: #718f60;
-  --accent-foreground: #ffffff;
-  --destructive: #dc3545;
-  --destructive-foreground: #ffffff;
-  --border: #dee2e6;
+  /* Identidade - 6 cores, iguais em todo projeto do autor, não mudam daqui. */
+  --black: #000000;
+  --gray: #616b75;
+  --blue-dark: #204a6f; /* marca no modo claro: link, botão primário, foco */
+  --blue-light: #5c9dd6; /* marca no modo escuro (ainda não ligado) + uso decorativo no claro */
+  --beige: #fbf7f1; /* fundo da página no claro */
+  --white: #ffffff; /* cartões, campos, tabelas */
+
+  /* Funcionais - vocabulário de interface, nunca de marca. */
+  --success: #2f7a54;
+  --warning: #8a6a10;
+  --accent: #b25610; /* só ícone/ilustração/badge - nunca botão nem link */
+  --error: #a32b3c;
+
+  /* Derivados por transparência - nenhum hex além dos dez acima. */
+  --border: rgba(0, 0, 0, 0.1);
+  --border-strong: rgba(0, 0, 0, 0.18);
+  --hover-row: rgba(0, 0, 0, 0.04);
+  --brand-tint: rgba(32, 74, 111, 0.1);
+  --brand-border: rgba(32, 74, 111, 0.2);
+  --focus-ring: rgba(32, 74, 111, 0.35);
+  --text-tertiary: rgba(0, 0, 0, 0.35);
+
+  /* Papéis semânticos (modo claro - único ligado por enquanto). */
+  --background: var(--beige);
+  --foreground: var(--black);
+  --card: var(--white);
+  --card-foreground: var(--black);
+  --popover: var(--white);
+  --popover-foreground: var(--black);
+  --primary: var(--blue-dark);
+  --primary-foreground: var(--white);
+  --secondary: var(--blue-light);
+  --secondary-foreground: var(--black);
+  --muted: var(--border);
+  --muted-foreground: var(--gray);
+  --accent-bg: var(--brand-tint);
+  --accent-foreground: var(--blue-dark);
+  --destructive: var(--error);
+  --destructive-foreground: var(--white);
   --input: transparent;
-  --input-background: #ffffff;
+  --input-background: var(--white);
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #324b2c;
+  --ring: var(--blue-dark);
   --radius: 0.75rem;
 }
+
+/* Papéis do modo escuro da especificação - documentados para quando um toggle
+   existir, sem nenhuma classe ligando isso ainda.
+:root[data-theme='dark'] {
+  --background: #000000;
+  --card: #12161a;
+  --foreground: #fbf7f1;
+  --muted-foreground: #8a939c;
+  --primary: #5c9dd6;
+  --success: #7fc5a0;
+  --warning: #e0b24e;
+  --accent: #e39055;
+  --destructive: #e0808f;
+  --border: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.22);
+  --hover-row: rgba(255, 255, 255, 0.05);
+}
+*/
 
 @theme inline {
   --color-background: var(--background);
@@ -51,7 +85,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
+  --color-accent: var(--accent-bg);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
@@ -59,6 +93,13 @@
   --color-input: var(--input);
   --color-input-background: var(--input-background);
   --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-brand-accent: var(--accent);
+  --color-surface: var(--card);
+  --color-brand: var(--primary);
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, Consolas, monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -71,7 +112,12 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    /* "l" com cauda, "1" com base - evita ambiguidade em identificador/slot. */
+    font-feature-settings:
+      'cv05' 1,
+      'cv08' 1;
+    font-variant-numeric: tabular-nums;
   }
 
   /* Barra de rolagem fina, quase invisível - combina com o visual minimalista do app. */
@@ -83,15 +129,15 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(113, 143, 96, 0.25);
+    background: rgba(32, 74, 111, 0.25);
     border-radius: 2px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(50, 75, 44, 0.35);
+    background: rgba(32, 74, 111, 0.4);
   }
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(113, 143, 96, 0.25) transparent;
+    scrollbar-color: rgba(32, 74, 111, 0.25) transparent;
   }
 
   html {
