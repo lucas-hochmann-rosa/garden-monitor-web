@@ -8,10 +8,10 @@ interface PlantOriginBadgeProps {
 export function PlantOriginBadge({ isExample }: PlantOriginBadgeProps) {
   return (
     <span
-      className={`px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide border ${
+      className={`px-2 py-0.5 rounded-full text-[10px] font-medium tracking-wide border ${
         isExample
-          ? 'bg-[#f8f9fa] border-[#dee2e6] text-[#6c757d]'
-          : 'bg-[#f1f5f0] border-[#c8d9c0] text-[#324b2c]'
+          ? 'bg-[#fbf7f1] border-[rgba(0,0,0,.1)] text-[#616b75]'
+          : 'bg-[rgba(32,74,111,.1)] border-[rgba(32,74,111,.2)] text-[#204a6f]'
       }`}
     >
       {isExample ? 'EXEMPLO' : 'REAL'}

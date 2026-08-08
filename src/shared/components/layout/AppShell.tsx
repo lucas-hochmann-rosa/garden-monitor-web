@@ -33,7 +33,7 @@ export function AppShell({ children, mode, adminUsername, alerts }: AppShellProp
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa]">
+    <div className="min-h-screen bg-[#fbf7f1]">
       <SidebarNav basePath={basePath} onSignOut={handleSignOut} signOutLabel={mode === 'admin' ? 'Sair' : 'Sair da demonstração'} />
       <Topbar mode={mode} adminUsername={adminUsername} alertsCount={alerts.length} onOpenAlerts={() => setIsAlertModalOpen(true)} />
 
