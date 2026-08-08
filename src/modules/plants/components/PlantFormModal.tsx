@@ -7,8 +7,13 @@
 import { ImagePlus, Trash2, Upload, X } from 'lucide-react';
 import { useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import type { Plant, PlantFormInput } from '@/modules/plants/types/plant.types';
+import { SelectField } from '@/shared/components/form/SelectField';
+import { DateField } from '@/shared/components/form/DateField';
 
-const CULTIVATION_SLOTS = Array.from({ length: 50 }, (_, index) => `Slot ${index + 1}`);
+// 16 cobre até dois multiplexadores CD74HC4051 encadeados (8 canais cada) - a
+// capacidade real de um hub ESP8266 com o hardware documentado em
+// firmware/README.md, não um número arbitrário como antes.
+const CULTIVATION_SLOTS = Array.from({ length: 16 }, (_, index) => `Slot ${index + 1}`);
 
 // Estado interno do formulário - campos numéricos ficam como string para os inputs controlados
 // e são convertidos para o formato aninhado (PlantFormInput) apenas no envio.
@@ -171,22 +176,15 @@ export function PlantFormModal({ onClose, onSave, initialPlant, isEditMode = fal
                 <div className="mb-3">
                   <label className={labelClassName}>
                     Slot de cultivo <span className="text-amber-500">*</span>
-                    <span className="ml-1 text-[#adb5bd] font-normal">(1-50)</span>
+                    <span className="ml-1 text-[#adb5bd] font-normal">(1-16)</span>
                   </label>
-                  <select
-                    name="slot"
+                  <SelectField
                     value={formState.slot}
-                    onChange={handleFieldChange}
+                    onChange={(slot) => setFormState((previous) => ({ ...previous, slot }))}
+                    options={CULTIVATION_SLOTS}
+                    placeholder="Selecione um slot"
                     required
-                    className={inputClassName}
-                  >
-                    <option value="">Selecione um slot</option>
-                    {CULTIVATION_SLOTS.map((slot) => (
-                      <option key={slot} value={slot}>
-                        {slot}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </div>
 
                 <div>
@@ -209,24 +207,18 @@ export function PlantFormModal({ onClose, onSave, initialPlant, isEditMode = fal
                   <label className={labelClassName}>
                     Data de plantio <span className="text-amber-500">*</span>
                   </label>
-                  <input
-                    type="date"
-                    name="plantedDate"
+                  <DateField
                     value={formState.plantedDate}
-                    onChange={handleFieldChange}
+                    onChange={(plantedDate) => setFormState((previous) => ({ ...previous, plantedDate }))}
                     required
-                    className={inputClassName}
                   />
                 </div>
 
                 <div className="mb-4">
                   <label className={labelClassName}>Colheita estimada</label>
-                  <input
-                    type="date"
-                    name="estimatedDate"
+                  <DateField
                     value={formState.estimatedDate}
-                    onChange={handleFieldChange}
-                    className={inputClassName}
+                    onChange={(estimatedDate) => setFormState((previous) => ({ ...previous, estimatedDate }))}
                   />
                 </div>
 

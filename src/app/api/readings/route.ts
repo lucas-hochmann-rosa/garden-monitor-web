@@ -23,6 +23,11 @@ const readingsBatchSchema = z.object({
 // da horta (DHT11, opcional) e a leitura de solo/pH de cada planta configurada no
 // firmware (ver firmware/esp8266_garden_monitor). Slots sem planta cadastrada não
 // derrubam a requisição inteira - vêm listados em "unknownSlots" na resposta.
+//
+// A resposta também é o canal usado pra mandar comandos de irrigação automática
+// pro hub ("irrigationCommands": [{ slot, milliliters }]) - em vez de um endpoint
+// separado de polling, o mesmo ciclo que publica as leituras já devolve o que
+// precisa ser irrigado agora (ver ingestReadingsBatch, em plants.service.ts).
 export async function POST(request: Request) {
   const apiKey = request.headers.get('x-api-key');
   if (!apiKey || apiKey !== process.env.DEVICE_API_KEY) {

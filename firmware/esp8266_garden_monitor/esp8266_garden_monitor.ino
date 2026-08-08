@@ -11,22 +11,31 @@
  * funciona no modo simples (1 sensor de solo ligado direto no A0), que é o
  * setup físico atual.
  *
+ * Além de publicar leituras, o hub também aciona a irrigação automática: cada
+ * planta pode ter um relé próprio (irrigationRelayPin em PLANT_SENSORS), e a
+ * cada ciclo a API devolve, na resposta do próprio POST de leituras, quais
+ * plantas estão com irrigação vencida - ver processIrrigationCommands() e o
+ * comentário de ingestReadingsBatch em src/modules/plants/server/plants.service.ts.
+ *
  * Todas as leituras do ciclo (clima + cada planta) são enviadas num único
  * POST para a API, no formato:
  *   { "climate": { "temperature": 24.1, "airHumidity": 58.7 },
  *     "plants": [{ "slot": "Slot 1", "soilMoisture": 62.4, "ph": 6.6 }] }
+ * E a resposta pode trazer:
+ *   { "irrigationCommands": [{ "slot": "Slot 1", "milliliters": 250 }] }
  *
  * Bibliotecas necessárias (Arduino IDE > Sketch > Include Library > Manage Libraries):
  *   - ESP8266WiFi / ESP8266HTTPClient / WiFiClientSecure (inclusas no pacote esp8266 do Arduino)
  *   - ArduinoJson (por Benoit Blanchon)
  *   - DHT sensor library (por Adafruit) + Adafruit Unified Sensor
  *
- * Ligações (ver firmware/README.md para o diagrama completo):
+ * Ligações (ver firmware/README.md para o diagrama completo e o guia de custo):
  *   - DHT11 (dados)                                 -> D4 (GPIO2)
  *   - Sem multiplexador: sensor de solo (analógico)  -> A0
  *   - Com multiplexador: saída do CD74HC4051         -> A0
  *                        pinos de seleção S0/S1/S2    -> D5/D6/D7
  *   - PH4502C (analógico, quando presente)            -> um canal do multiplexador
+ *   - Módulo relé de cada planta irrigada              -> um pino digital livre (D1/D2/...)
  */
 
 #include <ESP8266WiFi.h>
@@ -48,6 +57,8 @@ const char *API_URL = "https://SEU-PROJETO.vercel.app/api/readings";
 const char *DEVICE_API_KEY = "troque-por-uma-chave-aleatoria-para-o-esp8266";
 
 // Intervalo entre ciclos de leitura enviados para a API (5 minutos por padrão).
+// Também é, na prática, a resolução da irrigação automática: o hub só percebe que
+// uma planta está devendo água na próxima vez que publicar uma leitura dela.
 const unsigned long READING_INTERVAL_MS = 5UL * 60UL * 1000UL;
 
 // Pino de dados do DHT11 (clima da horta - compartilhado por todas as plantas).
@@ -78,23 +89,45 @@ const int SOIL_MOISTURE_WET_VALUE = 300;  // leitura do sensor completamente mol
 const float PH_NEUTRAL_READING = 512.0; // leitura em pH 7.0
 const float PH_ACID_READING = 660.0;    // leitura em pH 4.0
 
+// ---- Irrigação automática (relé + mini-bomba submersível, ver firmware/README.md) ----
+
+// A maioria dos módulos-relé de 1 canal baratos é "ativa em LOW" (o pino em LOW liga
+// o relé). Se o seu módulo for o contrário, inverta estas duas constantes.
+const int RELAY_ON = LOW;
+const int RELAY_OFF = HIGH;
+
+// Vazão da bomba em ml/segundo - calibre cronometrando 10s de bomba ligada
+// despejando água num recipiente medidor e dividindo o volume coletado por 10.
+const float PUMP_FLOW_RATE_ML_PER_SEC = 8.0; // estimativa - recalibre com a bomba real
+
+// Trava de segurança: nunca deixa um comando (ou uma conta errada) manter a bomba
+// ligada além disso, mesmo que a vazão calibrada esteja muito errada.
+const unsigned long MAX_IRRIGATION_DURATION_MS = 60UL * 1000UL;
+
+// Pinos de relé livres mesmo com o multiplexador de sensores ligado (D5/D6/D7 ficam
+// ocupados pelo mux nesse caso) - use quantos precisar em PLANT_SENSORS abaixo.
+const int IRRIGATION_RELAY_PIN_1 = D1;
+const int IRRIGATION_RELAY_PIN_2 = D2;
+
 // Um item por planta monitorada por este hub. "soilMoistureChannel"/"phChannel" só
 // importam quando USE_ANALOG_MULTIPLEXER é true (canal 0-7 do CD74HC4051).
+// "irrigationRelayPin" é -1 quando a planta não tem irrigação automática nesse hub.
 struct PlantSensorConfig {
   const char *slot; // precisa bater com o slot cadastrado em /admin/plants
   int soilMoistureChannel;
   bool hasPhSensor;
   int phChannel;
+  int irrigationRelayPin;
 };
 
 #if USE_ANALOG_MULTIPLEXER
 PlantSensorConfig PLANT_SENSORS[] = {
-  {"Slot 1", 0, false, -1},
-  {"Slot 2", 1, true, 2}, // exemplo de planta com sonda de pH no canal 2 do mux
+  {"Slot 1", 0, false, -1, IRRIGATION_RELAY_PIN_1},
+  {"Slot 2", 1, true, 2, IRRIGATION_RELAY_PIN_2}, // exemplo com sonda de pH no canal 2 do mux
 };
 #else
 PlantSensorConfig PLANT_SENSORS[] = {
-  {"Slot 1", -1, false, -1}, // único sensor de solo, ligado direto no A0
+  {"Slot 1", -1, false, -1, IRRIGATION_RELAY_PIN_1}, // único sensor de solo, ligado direto no A0
 };
 #endif
 
@@ -136,6 +169,52 @@ float phRawToValue(int rawValue) {
   return 7.0 + (rawValue - PH_NEUTRAL_READING) * slopePerReading;
 }
 
+// Aciona o relé da planta "slot" pelo tempo necessário pra liberar "milliliters" de
+// água, calculado a partir de PUMP_FLOW_RATE_ML_PER_SEC. Chamada bloqueante (igual o
+// resto do sketch) - por isso é sempre a última coisa feita no ciclo, depois de já
+// ter enviado as leituras.
+void triggerIrrigation(const char *slot, float milliliters) {
+  for (int i = 0; i < PLANT_SENSOR_COUNT; i++) {
+    if (strcmp(PLANT_SENSORS[i].slot, slot) != 0) continue;
+
+    int relayPin = PLANT_SENSORS[i].irrigationRelayPin;
+    if (relayPin < 0) {
+      Serial.printf("WARNING: comando de irrigacao para \"%s\" ignorado - nenhum rele configurado nesse slot.\n", slot);
+      return;
+    }
+
+    unsigned long durationMs = (unsigned long)((milliliters / PUMP_FLOW_RATE_ML_PER_SEC) * 1000.0);
+    durationMs = min(durationMs, MAX_IRRIGATION_DURATION_MS);
+
+    Serial.printf("INFO: irrigando \"%s\" por %lums (~%.0fml)\n", slot, durationMs, milliliters);
+    digitalWrite(relayPin, RELAY_ON);
+    delay(durationMs);
+    digitalWrite(relayPin, RELAY_OFF);
+    return;
+  }
+
+  Serial.printf("WARNING: comando de irrigacao para \"%s\" ignorado - slot nao configurado neste hub.\n", slot);
+}
+
+// Lê "irrigationCommands" da resposta de /api/readings e aciona o relé de cada
+// planta pendente, uma de cada vez (ver triggerIrrigation). Se a resposta não vier
+// no formato esperado, só ignora - o próximo ciclo tenta de novo.
+void processIrrigationCommands(const String &responseBody) {
+  JsonDocument response;
+  DeserializationError parseError = deserializeJson(response, responseBody);
+  if (parseError) {
+    Serial.printf("WARNING: nao foi possivel interpretar a resposta da API (%s) - nenhuma irrigacao neste ciclo.\n", parseError.c_str());
+    return;
+  }
+
+  JsonArray commands = response["irrigationCommands"].as<JsonArray>();
+  for (JsonObject command : commands) {
+    const char *slot = command["slot"];
+    float milliliters = command["milliliters"];
+    triggerIrrigation(slot, milliliters);
+  }
+}
+
 // Conecta-se à rede Wi-Fi configurada, aguardando até obter um endereço IP.
 void connectToWifi() {
   Serial.printf("INFO: conectando a wi-fi \"%s\"...\n", WIFI_SSID);
@@ -150,7 +229,8 @@ void connectToWifi() {
   Serial.printf("\nINFO: wi-fi conectado. IP: %s\n", WiFi.localIP().toString().c_str());
 }
 
-// Monta o payload JSON do ciclo (clima + leitura de cada planta) e envia para a API.
+// Monta o payload JSON do ciclo (clima + leitura de cada planta), envia para a API e,
+// com a resposta, aciona a irrigação automática das plantas que estiverem devendo.
 void sendReadingsBatch(float temperature, float airHumidity) {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("WARNING: wi-fi desconectado, tentando reconectar antes de enviar.");
@@ -194,7 +274,9 @@ void sendReadingsBatch(float temperature, float airHumidity) {
   int statusCode = http.POST(payloadJson);
 
   if (statusCode > 0) {
-    Serial.printf("INFO: resposta da API: %d - %s\n", statusCode, http.getString().c_str());
+    String responseBody = http.getString();
+    Serial.printf("INFO: resposta da API: %d - %s\n", statusCode, responseBody.c_str());
+    processIrrigationCommands(responseBody);
   } else {
     Serial.printf("ERROR: falha ao enviar leituras: %s\n", http.errorToString(statusCode).c_str());
   }
@@ -213,6 +295,12 @@ void setup() {
   pinMode(MUX_SELECT_PIN_1, OUTPUT);
   pinMode(MUX_SELECT_PIN_2, OUTPUT);
 #endif
+
+  for (int i = 0; i < PLANT_SENSOR_COUNT; i++) {
+    if (PLANT_SENSORS[i].irrigationRelayPin < 0) continue;
+    pinMode(PLANT_SENSORS[i].irrigationRelayPin, OUTPUT);
+    digitalWrite(PLANT_SENSORS[i].irrigationRelayPin, RELAY_OFF); // começa desligado
+  }
 
   connectToWifi();
 }
