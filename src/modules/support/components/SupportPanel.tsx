@@ -37,7 +37,7 @@ export function SupportPanel() {
         <div className="flex-shrink-0">
           <h1 className="text-2xl font-bold text-[#324b2c]">Precisa de ajuda?</h1>
           <p className="text-sm text-[#6c757d] mt-1">
-            Entre em contato conosco pelo email{' '}
+            Entre em contato pelo email{' '}
             <span className="font-bold">hrlucas.dev@gmail.com</span> ou abra uma solicitação de suporte pelo formulário abaixo.
           </p>
         </div>

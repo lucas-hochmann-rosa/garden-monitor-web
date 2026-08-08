@@ -25,7 +25,7 @@ function isOutOfRange(value: number | null | undefined, range?: PlantRange): boo
 // Deriva o status da planta comparando solo, pH e temperatura da horta com as faixas
 // ideais cadastradas - qualquer um dos três fora da faixa já marca "warning".
 export function calculateStatus(
-  soilMoisture: number,
+  soilMoisture: number | null,
   pH: number | null,
   gardenTemperature: number | null,
   idealMoisture?: PlantRange,

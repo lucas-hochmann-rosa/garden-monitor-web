@@ -129,9 +129,10 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
   };
 
   const isHealthy = plant.status === 'healthy';
+  const isAwaitingSensor = !plant.isExample && !plant.hasRealReading;
 
   const getMoistureStatus = () => {
-    if (!plant.idealMoisture) return 'ok';
+    if (plant.soilMoisture === null || !plant.idealMoisture) return 'ok';
     if (plant.soilMoisture < plant.idealMoisture.min) return 'low';
     if (plant.soilMoisture > plant.idealMoisture.max) return 'high';
     return 'ok';
@@ -180,12 +181,14 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
             <PlantOriginBadge isExample={plant.isExample} />
             <span
               className={`px-3 py-1 rounded-full text-xs font-semibold border ${
-                isHealthy
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  : 'bg-amber-50 text-amber-600 border-amber-200'
+                isAwaitingSensor
+                  ? 'bg-[#f8f9fa] text-[#6c757d] border-[#dee2e6]'
+                  : isHealthy
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-amber-50 text-amber-600 border-amber-200'
               }`}
             >
-              {isHealthy ? '✓ Saudável' : '⚠ Em alerta'}
+              {isAwaitingSensor ? 'Aguardando sensor' : isHealthy ? '✓ Saudável' : '⚠ Em alerta'}
             </span>
             <button onClick={onClose} className="p-1.5 hover:bg-[#f8f9fa] rounded-lg transition-colors">
               <X className="w-4 h-4 text-[#6c757d]" />
@@ -268,7 +271,9 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
                     <Droplet className="w-4 h-4 text-blue-400" />
                     <span className="text-sm font-semibold text-[#324b2c]">Umidade do solo</span>
                   </div>
-                  <span className="text-xl font-black text-[#324b2c]">{plant.soilMoisture}%</span>
+                  <span className="text-xl font-black text-[#324b2c]">
+                    {plant.soilMoisture !== null ? `${plant.soilMoisture}%` : 'Sem leitura'}
+                  </span>
                 </div>
                 {plant.idealMoisture && (
                   <p className="text-[11px] text-[#adb5bd] mb-1.5">
@@ -280,7 +285,7 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
                     className={`absolute h-full rounded-full transition-all ${
                       moistureStatus === 'ok' ? 'bg-blue-400' : 'bg-amber-400'
                     }`}
-                    style={{ width: `${Math.min(plant.soilMoisture, 100)}%` }}
+                    style={{ width: plant.soilMoisture !== null ? `${Math.min(plant.soilMoisture, 100)}%` : '0%' }}
                   />
                 </div>
               </div>
@@ -291,14 +296,18 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
                     <FlaskConical className="w-4 h-4 text-[#718f60]" />
                     <span className="text-sm font-semibold text-[#324b2c]">pH do solo</span>
                   </div>
-                  <span className="text-xl font-black text-[#324b2c]">{plant.pH}</span>
+                  <span className="text-xl font-black text-[#324b2c]">{plant.pH !== null ? plant.pH : 'Sem leitura'}</span>
                 </div>
                 {plant.idealPH && (
                   <p className="text-[11px] text-[#adb5bd] mb-1.5">
                     Ideal: {plant.idealPH.min} - {plant.idealPH.max}
                   </p>
                 )}
-                <PhGradientBar ph={plant.pH} idealPH={plant.idealPH} />
+                {plant.pH !== null ? (
+                  <PhGradientBar ph={plant.pH} idealPH={plant.idealPH} />
+                ) : (
+                  <div className="h-2.5 rounded-full bg-[#dee2e6]" />
+                )}
               </div>
             </div>
 

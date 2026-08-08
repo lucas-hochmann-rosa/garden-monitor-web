@@ -112,4 +112,21 @@
     font-size: 1rem;
     line-height: 1.5;
   }
+
+  /* Cursor consistente em toda a interface: qualquer coisa clicável mostra a
+     mãozinha; o resto (texto, cards não-clicáveis, imagens estáticas) fica com a
+     seta padrão do navegador - sem precisar lembrar de "cursor-pointer" em cada
+     botão/link novo que for criado. */
+  button:not(:disabled),
+  a[href],
+  [role='button'],
+  select,
+  input[type='checkbox'],
+  input[type='radio'] {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
 }

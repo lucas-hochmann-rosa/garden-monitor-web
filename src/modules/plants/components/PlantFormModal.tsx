@@ -254,14 +254,14 @@ export function PlantFormModal({ onClose, onSave, initialPlant, isEditMode = fal
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="px-3 py-1.5 bg-white rounded-lg text-xs font-semibold text-[#324b2c] flex items-center gap-1.5 shadow"
+                        className="px-3 py-1.5 bg-white hover:bg-[#f1f5f0] rounded-lg text-xs font-semibold text-[#324b2c] flex items-center gap-1.5 shadow transition-colors"
                       >
                         <Upload className="w-3.5 h-3.5" /> Trocar
                       </button>
                       <button
                         type="button"
                         onClick={removeImage}
-                        className="px-3 py-1.5 bg-red-500 rounded-lg text-xs font-semibold text-white flex items-center gap-1.5 shadow"
+                        className="px-3 py-1.5 bg-red-500 hover:bg-red-600 rounded-lg text-xs font-semibold text-white flex items-center gap-1.5 shadow transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" /> Remover
                       </button>

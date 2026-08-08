@@ -113,6 +113,11 @@ export function DashboardPanel({ plants: plantsFromServer, summary: summaryFromS
                   <span className="text-sm font-semibold text-[#6c757d]"> · {summary.climate.airHumidity}% ar</span>
                 )}
               </p>
+              {summary.climate.temperature !== null && (
+                <span className="text-[10px] text-[#adb5bd] mt-0.5">
+                  {summary.climate.recordedAt ? 'Sensor da horta (DHT11)' : 'Estimado pelo clima da região'}
+                </span>
+              )}
             </div>
           </div>
 
@@ -166,10 +171,16 @@ export function DashboardPanel({ plants: plantsFromServer, summary: summaryFromS
                       <h3 className="font-semibold text-[#324b2c] text-sm">{plant.name}</h3>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
                         <PlantOriginBadge isExample={plant.isExample} />
-                        {plant.status === 'warning' && (
-                          <span className="flex items-center gap-1 text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
-                            ⚠ Alerta
+                        {!plant.isExample && !plant.hasRealReading ? (
+                          <span className="flex items-center gap-1 text-xs font-semibold text-[#6c757d] bg-[#f8f9fa] border border-[#dee2e6] px-2 py-0.5 rounded-full">
+                            Aguardando sensor
                           </span>
+                        ) : (
+                          plant.status === 'warning' && (
+                            <span className="flex items-center gap-1 text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                              ⚠ Alerta
+                            </span>
+                          )
                         )}
                       </div>
                     </div>
@@ -189,11 +200,15 @@ export function DashboardPanel({ plants: plantsFromServer, summary: summaryFromS
                       <div className="flex flex-col justify-center gap-2.5">
                         <div>
                           <p className="text-xs text-[#6c757d]">Umidade do solo</p>
-                          <p className="text-[22px] font-black text-[#324b2c] leading-tight">{plant.soilMoisture}%</p>
+                          <p className="text-[22px] font-black text-[#324b2c] leading-tight">
+                            {plant.soilMoisture !== null ? `${plant.soilMoisture}%` : '-'}
+                          </p>
                         </div>
                         <div>
                           <p className="text-xs text-[#6c757d]">pH</p>
-                          <p className="text-[22px] font-black text-[#324b2c] leading-tight">{plant.pH}</p>
+                          <p className="text-[22px] font-black text-[#324b2c] leading-tight">
+                            {plant.pH !== null ? plant.pH : '-'}
+                          </p>
                         </div>
                       </div>
                     </div>

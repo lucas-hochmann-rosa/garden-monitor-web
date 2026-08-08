@@ -20,10 +20,12 @@ export function summarizePlants(plants: Plant[], climate: GardenClimate): Dashbo
 
   const plantsWithRealReading = plants.filter((plant) => plant.hasRealReading);
 
+  // hasRealReading só é true depois de uma leitura de verdade (ver plants.service.ts),
+  // então soilMoisture nunca é null aqui - o "!" só satisfaz o TypeScript.
   const averageSoilMoisture =
     plantsWithRealReading.length > 0
       ? Math.round(
-          (plantsWithRealReading.reduce((total, plant) => total + plant.soilMoisture, 0) /
+          (plantsWithRealReading.reduce((total, plant) => total + plant.soilMoisture!, 0) /
             plantsWithRealReading.length) *
             10,
         ) / 10

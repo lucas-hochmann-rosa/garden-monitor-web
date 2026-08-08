@@ -13,8 +13,9 @@ export interface Plant {
   name: string;
   scientificName?: string;
   slot: string;
-  soilMoisture: number;
-  pH: number;
+  /** null = planta real que ainda não recebeu nenhuma leitura do sensor (nunca é null para plantas de exemplo). */
+  soilMoisture: number | null;
+  pH: number | null;
   growth: number;
   status: PlantStatus;
   image?: string;

@@ -45,9 +45,20 @@ function mapRowToPlant(row: PlantRow): Plant {
       ? { min: Number(row.ideal_temp_min), max: Number(row.ideal_temp_max) }
       : undefined;
 
+  // Plantas de exemplo sempre mostram um valor (baseline, até chegar leitura real) -
+  // é o que sustenta a demonstração pública. Plantas reais NUNCA mostram dado
+  // simulado: sem leitura real, o valor fica null e a interface exibe "sem leitura".
   const hasRealReading = row.latest_reading_at !== null;
-  const soilMoisture = hasRealReading ? Number(row.latest_soil_moisture) : Number(row.baseline_soil_moisture);
-  const pH = hasRealReading && row.latest_ph !== null ? Number(row.latest_ph) : Number(row.baseline_ph);
+  const soilMoisture = hasRealReading
+    ? Number(row.latest_soil_moisture)
+    : row.is_example
+      ? Number(row.baseline_soil_moisture)
+      : null;
+  const pH = hasRealReading && row.latest_ph !== null
+    ? Number(row.latest_ph)
+    : row.is_example
+      ? Number(row.baseline_ph)
+      : null;
   const gardenTemperature = row.garden_temperature !== null ? Number(row.garden_temperature) : null;
 
   return {
@@ -97,30 +108,6 @@ export async function listPlants(): Promise<Plant[]> {
     left join lateral (
       select temperature from climate_readings order by recorded_at desc limit 1
     ) cr on true
-    order by p.slot
-  `) as unknown as PlantRow[];
-
-  return rows.map(mapRowToPlant);
-}
-
-// Lista só as plantas de demonstração (usado pela rota pública /demo).
-export async function listExamplePlants(): Promise<Plant[]> {
-  const rows = (await sql`
-    select
-      p.*,
-      pr.soil_moisture as latest_soil_moisture,
-      pr.ph as latest_ph,
-      pr.recorded_at as latest_reading_at,
-      cr.temperature as garden_temperature
-    from plants p
-    left join lateral (
-      select soil_moisture, ph, recorded_at from plant_readings
-      where plant_id = p.id order by recorded_at desc limit 1
-    ) pr on true
-    left join lateral (
-      select temperature from climate_readings order by recorded_at desc limit 1
-    ) cr on true
-    where p.is_example = true
     order by p.slot
   `) as unknown as PlantRow[];
 

@@ -41,8 +41,12 @@ export function useDemoContext(): DemoContextValue | null {
 // sensor (a demonstração nunca recebe dado do ESP8266) - solo/pH ficam nos mesmos
 // valores padrão de referência usados no banco (ver db/schema.sql).
 function buildPlantFromForm(input: PlantFormInput, id: string, previous?: Plant): Plant {
-  const soilMoisture = previous?.soilMoisture ?? 50;
-  const pH = previous?.pH ?? 6.5;
+  // Cuidado com "??": se a planta editada for real e nunca tiver recebido leitura,
+  // previous.soilMoisture é null de propósito - não pode virar 50 só por ser
+  // "falsy". Só uma planta totalmente nova (sem "previous") ganha o valor de
+  // referência 50/6.5, igual ao baseline usado no seed.
+  const soilMoisture = previous ? previous.soilMoisture : 50;
+  const pH = previous ? previous.pH : 6.5;
 
   return {
     id,
@@ -54,7 +58,9 @@ function buildPlantFromForm(input: PlantFormInput, id: string, previous?: Plant)
     growth: calculateGrowthPercent(input.plantedDate, input.estimatedDate),
     status: calculateStatus(soilMoisture, pH, null, input.idealMoisture, input.idealPH, input.idealTemp),
     image: input.image,
-    isExample: true,
+    // Preserva se a planta editada era real ou de exemplo; só marca EXEMPLO por
+    // padrão quando é uma planta nova criada dentro da própria demonstração.
+    isExample: previous ? previous.isExample : true,
     plantedDate: input.plantedDate,
     estimatedDate: input.estimatedDate,
     idealMoisture: input.idealMoisture,
