@@ -1,9 +1,10 @@
 'use client';
 
-import { X, Droplet, FlaskConical, Sprout, Calendar, Timer, Clock } from 'lucide-react';
+import { X, Droplet, FlaskConical, Sprout, Calendar, Timer, Clock, AlertTriangle, WifiOff } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import type { Plant } from '@/modules/plants/types/plant.types';
 import { formatDatePtBr, formatRelativeTime } from '@/shared/lib/formatters';
+import { isSensorStale } from '@/shared/lib/plant-metrics';
 import { PlantOriginBadge } from '@/modules/plants/components/PlantOriginBadge';
 
 interface IrrigationModalProps {
@@ -130,6 +131,23 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
 
   const isHealthy = plant.status === 'healthy';
   const isAwaitingSensor = !plant.isExample && !plant.hasRealReading;
+  const isStaleSensor = isSensorStale(plant.hasRealReading, plant.lastReadingAt);
+  const needsIrrigationHardware = Boolean(plant.autoIrrigation) && !plant.irrigationHardwareInstalled;
+
+  // Próxima irrigação prevista, só faz sentido calcular quando existe hardware
+  // de verdade pra acionar - se a última nunca aconteceu, já está "vencida" (o
+  // backend dispara no próximo ciclo de leitura, ver checkAndRecordAutoIrrigation).
+  const nextIrrigationLabel = (() => {
+    if (!plant.autoIrrigation || !plant.irrigationHardwareInstalled || !plant.irrigationInterval) return undefined;
+    if (!plant.lastAutoIrrigationAt) return 'a qualquer momento';
+
+    const dueInMs = new Date(plant.lastAutoIrrigationAt).getTime() + plant.irrigationInterval * 3_600_000 - Date.now();
+    if (dueInMs <= 0) return 'a qualquer momento';
+
+    const dueInHours = Math.round(dueInMs / 3_600_000);
+    if (dueInHours < 1) return `em ${Math.round(dueInMs / 60_000)} min`;
+    return `em ${dueInHours}h`;
+  })();
 
   const getMoistureStatus = () => {
     if (plant.soilMoisture === null || !plant.idealMoisture) return 'ok';
@@ -162,14 +180,22 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
             </div>
           </div>
 
-          <div className="flex items-center gap-2 px-3.5 py-2 bg-[#f1f5f0] border border-[#c8d9c0] rounded-xl">
+          <div
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border ${
+              isStaleSensor ? 'bg-amber-50 border-amber-200' : 'bg-[#f1f5f0] border-[#c8d9c0]'
+            }`}
+          >
             <span
-              className={`w-2 h-2 rounded-full flex-shrink-0 ${plant.hasRealReading ? 'bg-emerald-500 animate-pulse' : 'bg-[#adb5bd]'}`}
+              className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                isStaleSensor ? 'bg-amber-500' : plant.hasRealReading ? 'bg-emerald-500 animate-pulse' : 'bg-[#adb5bd]'
+              }`}
             />
-            <Clock className="w-3.5 h-3.5 text-[#718f60] flex-shrink-0" />
+            <Clock className={`w-3.5 h-3.5 flex-shrink-0 ${isStaleSensor ? 'text-amber-600' : 'text-[#718f60]'}`} />
             <div className="flex items-baseline gap-1.5">
-              <span className="text-xs font-semibold text-[#324b2c]">Última leitura</span>
-              <span className="text-xs text-[#6c757d]">
+              <span className={`text-xs font-semibold ${isStaleSensor ? 'text-amber-700' : 'text-[#324b2c]'}`}>
+                Última leitura
+              </span>
+              <span className={`text-xs ${isStaleSensor ? 'text-amber-600' : 'text-[#6c757d]'}`}>
                 {plant.hasRealReading && plant.lastReadingAt
                   ? formatRelativeTime(plant.lastReadingAt)
                   : 'aguardando sensor'}
@@ -183,12 +209,20 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
               className={`px-3 py-1 rounded-full text-xs font-semibold border ${
                 isAwaitingSensor
                   ? 'bg-[#f8f9fa] text-[#6c757d] border-[#dee2e6]'
-                  : isHealthy
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : 'bg-amber-50 text-amber-600 border-amber-200'
+                  : isStaleSensor
+                    ? 'bg-amber-50 text-amber-600 border-amber-200'
+                    : isHealthy
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : 'bg-amber-50 text-amber-600 border-amber-200'
               }`}
             >
-              {isAwaitingSensor ? 'Aguardando sensor' : isHealthy ? '✓ Saudável' : '⚠ Em alerta'}
+              {isAwaitingSensor
+                ? 'Aguardando sensor'
+                : isStaleSensor
+                  ? '⚠ Sensor sem reportar'
+                  : isHealthy
+                    ? '✓ Saudável'
+                    : '⚠ Em alerta'}
             </span>
             <button onClick={onClose} className="p-1.5 hover:bg-[#f8f9fa] rounded-lg transition-colors">
               <X className="w-4 h-4 text-[#6c757d]" />
@@ -334,8 +368,45 @@ export function PlantDetailsModal({ plant, onClose, onIrrigate }: PlantDetailsMo
                     </span>
                   </div>
                 )}
+
+                {plant.autoIrrigation && plant.irrigationHardwareInstalled && (
+                  <div className="flex items-center gap-2 mt-2.5 pt-2.5 border-t border-[#dee2e6]">
+                    <Clock className="w-3.5 h-3.5 text-[#718f60]" />
+                    <span className="text-xs text-[#6c757d]">Última irrigação automática:</span>
+                    <span className="text-xs font-bold text-[#324b2c] ml-auto">
+                      {plant.lastAutoIrrigationAt ? formatRelativeTime(plant.lastAutoIrrigationAt) : 'nunca'}
+                    </span>
+                  </div>
+                )}
+
+                {nextIrrigationLabel && (
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className="text-xs text-[#6c757d]">Próxima prevista:</span>
+                    <span className="text-xs font-bold text-[#324b2c] ml-auto">{nextIrrigationLabel}</span>
+                  </div>
+                )}
+
+                {needsIrrigationHardware && (
+                  <div className="flex items-start gap-2 mt-2.5 pt-2.5 border-t border-amber-200">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-amber-700">
+                      Hardware de irrigação não instalado neste slot. Nenhum comando será enviado ao hub até o relé e a
+                      bomba serem montados e a opção marcada no cadastro da planta.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
+
+            {isStaleSensor && (
+              <div className="flex items-start gap-2 p-3 rounded-xl border border-amber-200 bg-amber-50">
+                <WifiOff className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-700">
+                  Nenhuma leitura chegou nos últimos 30 minutos. Verifique se o hub ESP8266 está ligado e conectado à
+                  rede.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 

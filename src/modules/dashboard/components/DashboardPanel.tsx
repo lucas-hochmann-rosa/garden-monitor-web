@@ -11,6 +11,7 @@ import { PlantOriginBadge } from '@/modules/plants/components/PlantOriginBadge';
 import type { Plant } from '@/modules/plants/types/plant.types';
 import type { DashboardSummary } from '@/modules/dashboard/types/dashboard.types';
 import { formatRelativeTime } from '@/shared/lib/formatters';
+import { isSensorStale } from '@/shared/lib/plant-metrics';
 import { useDemoContext } from '@/shared/demo/DemoProvider';
 
 interface DashboardPanelProps {
@@ -174,6 +175,10 @@ export function DashboardPanel({ plants: plantsFromServer, summary: summaryFromS
                         {!plant.isExample && !plant.hasRealReading ? (
                           <span className="flex items-center gap-1 text-xs font-semibold text-[#6c757d] bg-[#f8f9fa] border border-[#dee2e6] px-2 py-0.5 rounded-full">
                             Aguardando sensor
+                          </span>
+                        ) : isSensorStale(plant.hasRealReading, plant.lastReadingAt) ? (
+                          <span className="flex items-center gap-1 text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                            ⚠ Sem reportar
                           </span>
                         ) : (
                           plant.status === 'warning' && (

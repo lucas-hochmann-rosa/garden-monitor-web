@@ -69,6 +69,8 @@ function buildPlantFromForm(input: PlantFormInput, id: string, previous?: Plant)
     autoIrrigation: input.autoIrrigation,
     irrigationAmount: input.irrigationAmount,
     irrigationInterval: input.irrigationInterval,
+    irrigationHardwareInstalled: input.irrigationHardwareInstalled ?? false,
+    lastAutoIrrigationAt: previous?.lastAutoIrrigationAt,
     notes: input.notes,
     hasRealReading: previous?.hasRealReading ?? false,
     lastReadingAt: previous?.lastReadingAt,

@@ -36,3 +36,16 @@ export function calculateStatus(
     isOutOfRange(soilMoisture, idealMoisture) || isOutOfRange(pH, idealPH) || isOutOfRange(gardenTemperature, idealTemp);
   return hasAlert ? 'warning' : 'healthy';
 }
+
+// O hub publica a cada READING_INTERVAL_MS do firmware (5 min por padrão) - um
+// limite bem mais folgado que isso já indica hub offline/com problema, sem gerar
+// falso positivo por um ciclo perdido isolado (rede instável, reinício, etc.).
+export const STALE_READING_THRESHOLD_MS = 30 * 60 * 1000;
+
+// "Sensor parado": a planta já teve leitura real alguma vez, mas faz tempo demais
+// que não chega uma nova. Plantas de exemplo e plantas que nunca leram nada (ver
+// hasRealReading) não entram aqui - esses casos já têm indicador próprio.
+export function isSensorStale(hasRealReading: boolean, lastReadingAt: string | undefined): boolean {
+  if (!hasRealReading || !lastReadingAt) return false;
+  return Date.now() - new Date(lastReadingAt).getTime() > STALE_READING_THRESHOLD_MS;
+}

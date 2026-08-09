@@ -32,6 +32,7 @@ interface PlantFormState {
   irrigationAmount: string;
   irrigationInterval: string;
   autoIrrigation: boolean;
+  irrigationHardwareInstalled: boolean;
   notes: string;
   image: string;
 }
@@ -52,6 +53,7 @@ function toFormState(plant?: Plant): PlantFormState {
     irrigationAmount: plant?.irrigationAmount !== undefined ? String(plant.irrigationAmount) : '',
     irrigationInterval: plant?.irrigationInterval !== undefined ? String(plant.irrigationInterval) : '',
     autoIrrigation: plant?.autoIrrigation ?? false,
+    irrigationHardwareInstalled: plant?.irrigationHardwareInstalled ?? false,
     notes: plant?.notes ?? '',
     image: plant?.image ?? '',
   };
@@ -77,6 +79,7 @@ function toPlantFormInput(state: PlantFormState): PlantFormInput {
     autoIrrigation: state.autoIrrigation,
     irrigationAmount: toNumber(state.irrigationAmount),
     irrigationInterval: toNumber(state.irrigationInterval),
+    irrigationHardwareInstalled: state.irrigationHardwareInstalled,
     notes: state.notes || undefined,
     image: state.image || undefined,
   };
@@ -390,6 +393,25 @@ export function PlantFormModal({ onClose, onSave, initialPlant, isEditMode = fal
                     />
                   </div>
                 </div>
+
+                {formState.autoIrrigation && (
+                  <label className="flex items-start gap-2.5 p-3 bg-[#f8f9fa] border border-[#dee2e6] rounded-xl cursor-pointer hover:border-[#718f60] transition-colors mt-3">
+                    <input
+                      type="checkbox"
+                      name="irrigationHardwareInstalled"
+                      checked={formState.irrigationHardwareInstalled}
+                      onChange={handleFieldChange}
+                      className="w-4 h-4 accent-[#324b2c] mt-0.5 flex-shrink-0"
+                    />
+                    <div>
+                      <p className="text-sm font-semibold text-[#324b2c]">Hardware de irrigação instalado</p>
+                      <p className="text-xs text-[#6c757d] mt-0.5">
+                        Marque só depois que o relé e a bomba estiverem fisicamente montados neste slot. Sem isso,
+                        nenhum comando de irrigação é enviado ao hub, mesmo com a irrigação automática ativada.
+                      </p>
+                    </div>
+                  </label>
+                )}
               </div>
             </div>
           </form>

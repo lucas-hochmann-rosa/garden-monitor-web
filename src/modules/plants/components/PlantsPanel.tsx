@@ -11,6 +11,7 @@ import { PlantDetailsModal } from '@/modules/plants/components/PlantDetailsModal
 import { PlantFormModal } from '@/modules/plants/components/PlantFormModal';
 import { PlantOriginBadge } from '@/modules/plants/components/PlantOriginBadge';
 import type { Plant, PlantFormInput } from '@/modules/plants/types/plant.types';
+import { isSensorStale } from '@/shared/lib/plant-metrics';
 import { useDemoContext } from '@/shared/demo/DemoProvider';
 
 interface DeleteConfirmationModalProps {
@@ -199,12 +200,21 @@ export function PlantsPanel({ plants: plantsFromServer }: PlantsPanelProps) {
                         <span className="px-2.5 py-1 bg-[#f8f9fa] border border-[#dee2e6] text-[#6c757d] text-xs font-semibold rounded-full">
                           Aguardando sensor
                         </span>
+                      ) : isSensorStale(plant.hasRealReading, plant.lastReadingAt) ? (
+                        <span className="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-full">
+                          ⚠ Sensor sem reportar
+                        </span>
                       ) : (
                         plant.status !== 'healthy' && (
                           <span className="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold rounded-full">
                             ⚠ Em alerta
                           </span>
                         )
+                      )}
+                      {!plant.isExample && plant.autoIrrigation && !plant.irrigationHardwareInstalled && (
+                        <span className="px-2.5 py-1 bg-[#f8f9fa] border border-[#dee2e6] text-[#6c757d] text-xs font-semibold rounded-full">
+                          Sem hardware de irrigação
+                        </span>
                       )}
                     </div>
                   </div>

@@ -23,6 +23,7 @@ interface PlantRow {
   auto_irrigation: boolean;
   irrigation_amount_ml: string | null;
   irrigation_interval_hours: string | null;
+  irrigation_hardware_installed: boolean;
   notes: string | null;
   baseline_soil_moisture: string;
   baseline_ph: string;
@@ -30,6 +31,7 @@ interface PlantRow {
   latest_ph: string | null;
   latest_reading_at: string | null;
   garden_temperature: string | null;
+  latest_auto_irrigation_at: string | null;
 }
 
 function mapRowToPlant(row: PlantRow): Plant {
@@ -81,6 +83,8 @@ function mapRowToPlant(row: PlantRow): Plant {
     autoIrrigation: row.auto_irrigation,
     irrigationAmount: row.irrigation_amount_ml !== null ? Number(row.irrigation_amount_ml) : undefined,
     irrigationInterval: row.irrigation_interval_hours !== null ? Number(row.irrigation_interval_hours) : undefined,
+    irrigationHardwareInstalled: row.irrigation_hardware_installed,
+    lastAutoIrrigationAt: row.latest_auto_irrigation_at ?? undefined,
     notes: row.notes ?? undefined,
     hasRealReading,
     lastReadingAt: row.latest_reading_at ?? undefined,
@@ -104,7 +108,8 @@ export async function listPlants(): Promise<Plant[]> {
       pr.soil_moisture as latest_soil_moisture,
       pr.ph as latest_ph,
       pr.recorded_at as latest_reading_at,
-      cr.temperature as garden_temperature
+      cr.temperature as garden_temperature,
+      ai.created_at as latest_auto_irrigation_at
     from plants p
     left join lateral (
       select soil_moisture, ph, recorded_at from plant_readings
@@ -113,6 +118,11 @@ export async function listPlants(): Promise<Plant[]> {
     left join lateral (
       select temperature from climate_readings order by recorded_at desc limit 1
     ) cr on true
+    left join lateral (
+      select created_at from records
+      where plant_id = p.id and type = 'auto-irrigation'
+      order by created_at desc limit 1
+    ) ai on true
     order by p.slot
   `) as unknown as PlantRow[];
 
@@ -129,7 +139,8 @@ export async function getPlantById(id: string): Promise<Plant | null> {
       pr.soil_moisture as latest_soil_moisture,
       pr.ph as latest_ph,
       pr.recorded_at as latest_reading_at,
-      cr.temperature as garden_temperature
+      cr.temperature as garden_temperature,
+      ai.created_at as latest_auto_irrigation_at
     from plants p
     left join lateral (
       select soil_moisture, ph, recorded_at from plant_readings
@@ -138,6 +149,11 @@ export async function getPlantById(id: string): Promise<Plant | null> {
     left join lateral (
       select temperature from climate_readings order by recorded_at desc limit 1
     ) cr on true
+    left join lateral (
+      select created_at from records
+      where plant_id = p.id and type = 'auto-irrigation'
+      order by created_at desc limit 1
+    ) ai on true
     where p.id = ${id}
   `) as unknown as PlantRow[];
 
@@ -153,7 +169,7 @@ export async function createPlant(input: PlantFormInput): Promise<Plant> {
       name, scientific_name, slot, image_url, is_example, planted_date, estimated_harvest_date,
       ideal_moisture_min, ideal_moisture_max, ideal_ph_min, ideal_ph_max,
       ideal_temp_min, ideal_temp_max, auto_irrigation, irrigation_amount_ml,
-      irrigation_interval_hours, notes
+      irrigation_interval_hours, irrigation_hardware_installed, notes
     )
     values (
       ${input.name}, ${input.scientificName || null}, ${input.slot}, ${input.image || null}, false,
@@ -162,7 +178,7 @@ export async function createPlant(input: PlantFormInput): Promise<Plant> {
       ${input.idealPH?.min ?? null}, ${input.idealPH?.max ?? null},
       ${input.idealTemp?.min ?? null}, ${input.idealTemp?.max ?? null},
       ${input.autoIrrigation ?? false}, ${input.irrigationAmount ?? null},
-      ${input.irrigationInterval ?? null}, ${input.notes || null}
+      ${input.irrigationInterval ?? null}, ${input.irrigationHardwareInstalled ?? false}, ${input.notes || null}
     )
     returning id
   `) as unknown as { id: string }[];
@@ -190,6 +206,7 @@ export async function updatePlant(id: string, input: PlantFormInput): Promise<Pl
       auto_irrigation = ${input.autoIrrigation ?? false},
       irrigation_amount_ml = ${input.irrigationAmount ?? null},
       irrigation_interval_hours = ${input.irrigationInterval ?? null},
+      irrigation_hardware_installed = ${input.irrigationHardwareInstalled ?? false},
       notes = ${input.notes || null}
     where id = ${id}
     returning id
@@ -234,6 +251,7 @@ interface AutoIrrigationPlantRow {
   auto_irrigation: boolean;
   irrigation_amount_ml: string | null;
   irrigation_interval_hours: string | null;
+  irrigation_hardware_installed: boolean;
 }
 
 // "Dispara e esquece": sem sensor de fluxo no hardware, não dá pra confirmar que a
@@ -241,8 +259,13 @@ interface AutoIrrigationPlantRow {
 // último comando emitido (reaproveita o histórico de "records" tipo
 // "auto-irrigation" em vez de guardar isso numa coluna nova), e o registro criado
 // representa "o comando foi mandado pro hub", não "a planta foi molhada de verdade".
+// Planta com auto_irrigation ligada mas irrigation_hardware_installed = false não
+// gera comando nem registro nenhum - o admin ainda não montou o relé/bomba, então
+// não existe nada de verdade pra acionar (a interface mostra esse estado, ver
+// PlantDetailsModal.tsx).
 async function checkAndRecordAutoIrrigation(plant: AutoIrrigationPlantRow): Promise<IrrigationCommand | null> {
-  if (!plant.auto_irrigation || !plant.irrigation_amount_ml || !plant.irrigation_interval_hours) return null;
+  if (!plant.auto_irrigation || !plant.irrigation_hardware_installed) return null;
+  if (!plant.irrigation_amount_ml || !plant.irrigation_interval_hours) return null;
 
   const lastRows = (await sql`
     select created_at from records
@@ -292,7 +315,7 @@ export async function ingestReadingsBatch(input: ReadingsBatchInput): Promise<Re
 
   for (const reading of input.plants) {
     const plantRows = (await sql`
-      select id, auto_irrigation, irrigation_amount_ml, irrigation_interval_hours
+      select id, auto_irrigation, irrigation_amount_ml, irrigation_interval_hours, irrigation_hardware_installed
       from plants where slot = ${reading.slot} and is_example = false
     `) as unknown as AutoIrrigationPlantRow[];
     const plant = plantRows[0];

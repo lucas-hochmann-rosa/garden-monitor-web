@@ -29,6 +29,10 @@ export interface Plant {
   autoIrrigation?: boolean;
   irrigationAmount?: number;
   irrigationInterval?: number;
+  /** Marcado manualmente pelo admin - só fica "true" depois que o relé/bomba forem instalados de verdade. */
+  irrigationHardwareInstalled: boolean;
+  /** Última vez que o backend emitiu um comando de irrigação automática (não confirma que a água saiu - ver firmware/README.md). */
+  lastAutoIrrigationAt?: string;
   notes?: string;
   /** true quando já existe ao menos uma leitura real enviada pelo ESP8266 para esta planta. */
   hasRealReading: boolean;
@@ -47,6 +51,7 @@ export type PlantFormInput = {
   autoIrrigation?: boolean;
   irrigationAmount?: number;
   irrigationInterval?: number;
+  irrigationHardwareInstalled?: boolean;
   notes?: string;
   image?: string;
 };

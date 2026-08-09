@@ -17,6 +17,7 @@ const plantInputSchema = z.object({
   autoIrrigation: z.boolean().optional(),
   irrigationAmount: z.number().optional(),
   irrigationInterval: z.number().optional(),
+  irrigationHardwareInstalled: z.boolean().optional(),
   notes: z.string().optional(),
   image: z.string().optional(),
 });
