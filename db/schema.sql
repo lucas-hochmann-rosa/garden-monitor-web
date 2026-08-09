@@ -59,6 +59,15 @@ create table if not exists plant_readings (
 create index if not exists idx_plant_readings_plant_recorded
   on plant_readings (plant_id, recorded_at desc);
 
+-- Evolução do schema depois do lançamento inicial: "create table if not exists"
+-- não adiciona coluna em tabela que já existe, por isso os campos novos entram
+-- como "alter table ... add column if not exists" (idempotente, seguro de rodar
+-- de novo em qualquer ambiente, já rodado ou não). Indica se o admin já montou
+-- fisicamente o relé/bomba daquela planta - sem isso, o backend ainda "sabe" que a
+-- irrigação está vencida, mas não faz sentido mandar comando pra um hub que não
+-- tem nada pra acionar (ver ingestReadingsBatch em plants.service.ts).
+alter table plants add column if not exists irrigation_hardware_installed boolean not null default false;
+
 -- Leituras de clima da horta (temperatura/umidade do ar), uma por ciclo do hub
 -- ESP8266 (sensor DHT11 compartilhado, não vinculado a uma planta específica).
 create table if not exists climate_readings (
